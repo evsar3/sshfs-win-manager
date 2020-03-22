@@ -55,7 +55,7 @@ app.on('ready', () => {
     {
       label: 'About',
       click () {
-        const window = windowManager.createNew('settings-window', '', '/index.html#about', null, {
+        const window = windowManager.createNew('about-window', '', '/index.html#about', null, {
           height: 380,
           width: 550,
           useContentSize: true,
