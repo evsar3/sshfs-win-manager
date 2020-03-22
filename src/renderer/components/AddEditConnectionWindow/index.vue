@@ -124,7 +124,7 @@ export default {
     if (this.$route.name === 'edit-connection') {
       this.isEditingMode = true
 
-      this.title = 'Edit Server'
+      this.title = 'Edit Connection'
 
       this.conn = this.$store.state.Data.connections.find(a => a.uuid === this.$route.params.uuid)
     }
