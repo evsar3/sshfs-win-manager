@@ -15,7 +15,7 @@ function spawn (conn) {
       conn.mountPoint,
       `-p${conn.port}`,
       '-oumask=000',
-      '-ocreate_umask=112',
+      '-ocreate_umask=113',
       '-oidmap=user',
       `-ovolname=${conn.name}`,
       '-omax_readahead=1GB',
