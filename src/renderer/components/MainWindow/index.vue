@@ -1,5 +1,5 @@
 <template>
-  <Window title="SSHFS-Win Manager" closeAction="hide">
+  <Window title="SSHFS-Win Manager" closeAction="hide" @close="showRunningInBackgroundNotification">
     <div class="wrap">
       <PerfectScrollbar class="list">
         <div v-if="!hasConnections" class="no-data">
@@ -59,6 +59,8 @@ import Icon from '@/components/Icon'
 import ConnectionItem from './ConnectionItem'
 
 const windowManager = remote.require('electron-window-manager')
+
+let notificationAlreadyShowed = false
 
 export default {
   name: 'main-window',
@@ -193,6 +195,18 @@ export default {
       window.object.once('ready-to-show', () => {
         window.object.show()
       })
+    },
+
+    showRunningInBackgroundNotification () {
+      if (!notificationAlreadyShowed) {
+        /* eslint-disable-next-line */
+        new Notification('SSHFS-Win Manager', {
+          icon: __static + '/app-icon.png',
+          body: 'Program still running in the system tray'
+        })
+
+        notificationAlreadyShowed = true
+      }
     },
 
     clearVuex () {
