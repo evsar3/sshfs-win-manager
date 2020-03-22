@@ -1,7 +1,7 @@
 <template>
   <div class="window">
     <div class="header-container">
-      <Header :title="title" :closeAction="closeAction"/>
+      <Header :title="title" :closeAction="closeAction" @close="$emit('close')"/>
     </div>
     <div class="content-container">
       <slot></slot>

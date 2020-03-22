@@ -41,6 +41,8 @@ export default {
       } else {
         window.close()
       }
+
+      this.$emit('close')
     }
   }
 }
