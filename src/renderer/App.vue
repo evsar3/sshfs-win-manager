@@ -22,12 +22,6 @@ export default {
 }
 </script>
 
-<style scoped>
-#app {
-  height: 100%;
-}
-</style>
-
 <style lang="less">
 * {
   margin: 0;
