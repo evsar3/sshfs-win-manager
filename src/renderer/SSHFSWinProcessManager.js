@@ -90,7 +90,7 @@ function spawn (conn) {
           }, processMonitoringInterval)
 
           processes.push(process)
-          console.log(processes)
+
           resolve(process)
         })
       }
@@ -100,8 +100,6 @@ function spawn (conn) {
 
 function terminateAllChildProcesses () {
   const killingQueue = []
-
-  console.log(processes)
 
   processes.forEach(process => {
     killingQueue.push(process.terminate())
