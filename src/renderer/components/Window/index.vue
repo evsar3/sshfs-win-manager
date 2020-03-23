@@ -37,15 +37,13 @@ export default {
 
 <style lang="less" scoped>
 .window {
-  display: flex;
-  flex-direction: column;
   border: 1px solid @main-color;
   height: 100%;
 
   .content-container {
     background-color: lighten(@main-color, 5%);
-    flex: 1;
     overflow: hidden;
+    height: calc(100vh - 2px - 30px); // 2px from border top and bottom and 30px for title bar
   }
 }
 </style>
