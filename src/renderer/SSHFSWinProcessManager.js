@@ -58,13 +58,13 @@ function spawn (conn) {
       terminate () {
         return new Promise(resolve => {
           killProcessTree(this.pid).then(() => {
-            if (this.events.exit) {
-              this.events.exit()
-            }
+            clearInterval(this.checkAliveTimer)
 
             processes = processes.filter(a => a.pid !== this.pid)
 
-            clearInterval(this.checkAliveTimer)
+            if (this.events.exit) {
+              this.events.exit()
+            }
 
             resolve()
           })
