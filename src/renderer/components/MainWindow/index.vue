@@ -60,8 +60,6 @@ import ConnectionItem from './ConnectionItem'
 
 const windowManager = remote.require('electron-window-manager')
 
-let notificationAlreadyShowed = false
-
 export default {
   name: 'main-window',
 
@@ -91,6 +89,8 @@ export default {
 
         process.on('notFound', () => {
           conn.status = 'disconnected'
+
+          this.notify(`'${conn.name}' was disconnected due to a connection error.\nCheck your internet connection`, 'error-icon')
         })
 
         process.on('exit', () => {
@@ -99,7 +99,7 @@ export default {
       }).catch(error => {
         conn.status = 'disconnected'
 
-        console.error('Process spawn error:', error)
+        this.notify(`Can't connect to '${conn.name}': ${error}`, 'error-icon')
       })
     },
 
@@ -198,20 +198,24 @@ export default {
     },
 
     showRunningInBackgroundNotification () {
-      if (!notificationAlreadyShowed) {
-        /* eslint-disable-next-line */
-        new Notification('SSHFS-Win Manager', {
-          icon: __static + '/app-icon.png',
-          body: 'Program still running in the system tray'
-        })
+      if (!this.runningInBackgroundNotificationShowed) {
+        this.notify('Program still running in the system tray')
 
-        notificationAlreadyShowed = true
+        this.runningInBackgroundNotificationShowed = true
       }
     },
 
     clearVuex () {
       this.$store.dispatch('CLEAR_CONNECTIONS')
       this.$store.dispatch('RESET_SETTINGS')
+    },
+
+    notify (text, icon = 'app-icon') {
+      /* eslint-disable-next-line */
+      new Notification('SSHFS-Win Manager', {
+        icon: __static + '/' + icon + '.png',
+        body: text
+      })
     }
   },
 
@@ -239,7 +243,8 @@ export default {
 
   data () {
     return {
-      listMode: 'none'
+      listMode: 'none',
+      runningInBackgroundNotificationShowed: false
     }
   }
 }
