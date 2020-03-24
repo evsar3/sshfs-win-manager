@@ -1,6 +1,6 @@
 {
   "name": "sshfs-win-manager",
-  "version": "0.1.1-beta.2",
+  "version": "0.1.1-beta.3",
   "author": "Evandro Araujo <evandro@babum.dev>",
   "description": "A GUI for SSHFS-Win (https://github.com/billziss-gh/sshfs-win)",
   "license": "MIT",
