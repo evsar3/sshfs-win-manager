@@ -21,6 +21,8 @@ function spawn (conn) {
       '-ocreate_umask=000',
       `-ovolname=${conn.name}`,
       '-omax_readahead=1GB',
+      '-oStrictHostKeyChecking=no',
+      '-oUserKnownHostsFile=/dev/null',
       '-oallow_other',
       '-olarge_read',
       '-okernel_cache'
