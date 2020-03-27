@@ -14,6 +14,8 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
+app.setAppUserModelId('SSHFS-Win Manager')
+
 windowManager.init({
   appBase: process.env.NODE_ENV === 'production'
     ? `file://${__dirname}`
