@@ -1,7 +1,7 @@
 {
   "name": "sshfs-win-manager",
-  "version": "0.1.1-beta.3",
-  "author": "Evandro Araujo <evandro@babum.dev>",
+  "version": "1.0.0",
+  "author": "Evandro Araujo <evandroprogram@gmail.com>",
   "description": "A GUI for SSHFS-Win (https://github.com/billziss-gh/sshfs-win)",
   "license": "MIT",
   "main": "./dist/electron/main.js",
@@ -24,7 +24,7 @@
     "appId": "dev.babum.apps.sshfs-win-manager",
     "artifactName": "sshfs-win-manager-setup-v${version}.${ext}",
     "nsis": {
-      "oneClick": false,
+      "oneClick": true,
       "installerIcon": "build/icons/setup-icon.ico",
       "uninstallDisplayName": "SSHFS-Win Manager"
     },
