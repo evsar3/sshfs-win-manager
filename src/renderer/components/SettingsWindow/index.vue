@@ -8,7 +8,7 @@
 
       <div class="form-item">
         <label>
-          <input type="checkbox" v-model="data.startupWithOS" disabled> <span>Startup with windows</span>
+          <input type="checkbox" v-model="data.startupWithOS"> <span>Startup with windows</span>
         </label>
       </div>
 
@@ -26,6 +26,7 @@ import { remote } from 'electron'
 import Window from '@/components/Window'
 
 const windowManager = remote.require('electron-window-manager')
+const app = remote.require('electron').app
 
 export default {
   name: 'settings-window',
@@ -42,6 +43,13 @@ export default {
     save () {
       this.$store.dispatch('UPDATE_SETTINGS', this.data)
 
+      app.setLoginItemSettings({
+        ...{
+          openAtLogin: this.data.startupWithOS
+        },
+        ...this.loginItemSettings
+      })
+
       windowManager.closeCurrent()
     }
   },
@@ -50,6 +58,22 @@ export default {
     data () {
       return this.$store.state.Settings.settings
     }
+  },
+
+  data () {
+    return {
+      loginItemSettings: {
+        args: [
+          '--systray'
+        ]
+      }
+    }
+  },
+
+  mounted () {
+    const settings = app.getLoginItemSettings(this.loginItemSettings)
+
+    this.data.startupWithOS = settings.openAtLogin
   }
 }
 </script>
