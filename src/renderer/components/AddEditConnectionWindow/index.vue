@@ -25,8 +25,8 @@
         <label>Authentication method</label>
         <select v-model="conn.authType">
           <option value="password">Password</option>
-          <option value="key-file" disabled>Private Key (file)</option>
-          <option value="key-input" disabled>Private Key (input)</option>
+          <option value="key-file">Private Key (file)</option>
+          <!-- <option value="key-input" disabled>Private Key (input)</option> -->
         </select>
       </div>
       <div v-show="conn.authType === 'password'" class="form-item">
@@ -111,7 +111,7 @@ export default {
         folder: '/',
         authType: 'password',
         password: '',
-        keyFile: process.env.USERPROFILE + '\\.ssh\\id_rsa.pub',
+        keyFile: process.env.USERPROFILE + '\\.ssh\\id_rsa',
         key: '',
         mountPoint: 'E:',
         status: 'disconnected',
