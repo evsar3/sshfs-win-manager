@@ -40,7 +40,7 @@ You're ready to go!
 ![Open mounted drive](https://c.servers.babum.dev/static/sshfs-win-manager/explorer-screenshot.png)  
 *Explore mounted drive*
 
-![Main Window](https://c.servers.babum.dev/static/sshfs-win-manager/systray-screenshot.png)  
+![System tray](https://c.servers.babum.dev/static/sshfs-win-manager/systray-screenshot.png)  
 *Close to system tray*
 
 ## Bugs & help
