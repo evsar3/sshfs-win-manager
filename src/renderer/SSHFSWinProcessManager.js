@@ -35,7 +35,7 @@ function spawn (conn) {
 
     if (conn.authType === 'key-file') {
       cmdArgs.push('-oPreferredAuthentications=publickey')
-      cmdArgs.push(`-oIdentityFile=${conn.keyFile.replace(/\\/g, '\\\\')}`)
+      cmdArgs.push(`-oIdentityFile="${conn.keyFile.replace(/\\/g, '/')}"`)
     }
 
     const childProcess = spawnChildProcess(sshfsWinPath, cmdArgs)
