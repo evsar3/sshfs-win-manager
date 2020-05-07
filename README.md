@@ -1,8 +1,8 @@
-<div style="text-align: center; margin-top: 3em;">
+<p align="center">
   <img src="https://img.shields.io/github/v/release/evsar3/sshfs-win-manager?sort=semver">
   <img src="https://img.shields.io/github/downloads/evsar3/sshfs-win-manager/total">
   <img src="https://img.shields.io/github/issues-raw/evsar3/sshfs-win-manager/bug?color=red">
-</div>
+</p>
 
 # SSHFS-Win Manager
 
