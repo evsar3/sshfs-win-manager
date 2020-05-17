@@ -49,13 +49,12 @@
 <script>
 import { remote, shell } from 'electron'
 
-import SSHFSWinProcessManager from '@/SSHFSWinProcessManager'
+// import SSHFSWinProcessManager from '@/SSHFSWinProcessManager'
+import SSHFSProcessManager from '@/SSHFSProcessManager'
 
 import { PerfectScrollbar } from 'vue2-perfect-scrollbar'
-
 import Window from '@/components/Window'
 import Icon from '@/components/Icon'
-
 import ConnectionItem from './ConnectionItem'
 
 const windowManager = remote.require('electron-window-manager')
@@ -83,19 +82,9 @@ export default {
     connect (conn) {
       conn.status = 'connecting'
 
-      SSHFSWinProcessManager.spawn(conn).then(process => {
-        conn.process = process
+      SSHFSProcessManager.create(conn).then(pid => {
+        conn.pid = pid
         conn.status = 'connected'
-
-        process.on('notFound', () => {
-          conn.status = 'disconnected'
-
-          this.notify(`'${conn.name}' was disconnected due to a connection error.\nCheck your internet connection`, 'error-icon')
-        })
-
-        process.on('exit', () => {
-          conn.status = 'disconnected'
-        })
       }).catch(error => {
         conn.status = 'disconnected'
 
@@ -106,7 +95,7 @@ export default {
     disconnect (conn) {
       conn.status = 'disconnecting'
 
-      conn.process.terminate().then(() => {
+      SSHFSProcessManager.terminate(conn.pid).then(() => {
         conn.status = 'disconnected'
       })
     },
@@ -216,6 +205,10 @@ export default {
         icon: __static + '/' + icon + '.png',
         body: text
       })
+    },
+
+    getConnectionByPid (pid) {
+      return this.connections.find(a => a.pid === pid)
     }
   },
 
@@ -246,6 +239,34 @@ export default {
       listMode: 'none',
       runningInBackgroundNotificationShowed: false
     }
+  },
+
+  mounted () {
+    SSHFSProcessManager.on('terminated', pid => {
+      console.log('Event "terminated" emmited')
+      let conn = this.getConnectionByPid(pid)
+
+      if (conn) {
+        conn.pid = null
+        conn.status = 'disconnected'
+      }
+    })
+
+    SSHFSProcessManager.on('not-found', pid => {
+      console.log('Event "not-found" emmited')
+      let conn = this.getConnectionByPid(pid)
+
+      if (conn) {
+        conn.pid = null
+        conn.status = 'disconnected'
+
+        this.notify(`'${conn.name}' was disconnected due to a connection error.\nCheck your internet connection`, 'error-icon')
+      }
+    })
+
+    SSHFSProcessManager.on('created', conn => {
+      console.log('Event "created" emmited')
+    })
   }
 }
 </script>

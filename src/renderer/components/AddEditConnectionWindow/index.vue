@@ -115,7 +115,7 @@ export default {
         key: '',
         mountPoint: 'E:',
         status: 'disconnected',
-        process: null
+        pid: 0
       }
     }
   },
