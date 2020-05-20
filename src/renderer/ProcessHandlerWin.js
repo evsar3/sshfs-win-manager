@@ -1,6 +1,6 @@
 import { spawn, exec } from 'child_process'
 
-class ProcessManagerWin {
+class ProcessHandlerWin {
   constructor (settings) {
     this.settings = settings
   }
@@ -35,8 +35,6 @@ class ProcessManagerWin {
         cmdArgs.push('-oPreferredAuthentications=publickey')
         cmdArgs.push(`-oIdentityFile="${conn.keyFile.replace(/\\/g, '/')}"`)
       }
-
-      console.log(this.settings.sshfsBinary, cmdArgs.join())
 
       const childProcess = spawn(this.settings.sshfsBinary, cmdArgs)
 
@@ -101,4 +99,4 @@ class ProcessManagerWin {
   }
 }
 
-export default ProcessManagerWin
+export default ProcessHandlerWin

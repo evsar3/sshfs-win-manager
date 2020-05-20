@@ -7,14 +7,14 @@
 <script>
 import { ipcRenderer } from 'electron'
 
-import SSHFSWinProcessManager from '@/SSHFSWinProcessManager'
+import ProcessManager from '@/ProcessManager'
 
 export default {
   name: 'sshfs-win-manager',
 
   mounted () {
     ipcRenderer.on('terminate-child-processes', () => {
-      SSHFSWinProcessManager.terminateAllChildProcesses().then(() => {
+      ProcessManager.terminateAll().then(() => {
         ipcRenderer.send('child-processes-terminated')
       })
     })

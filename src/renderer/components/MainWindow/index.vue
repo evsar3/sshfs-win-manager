@@ -49,8 +49,7 @@
 <script>
 import { remote, shell } from 'electron'
 
-// import SSHFSWinProcessManager from '@/SSHFSWinProcessManager'
-import SSHFSProcessManager from '@/SSHFSProcessManager'
+import ProcessManager from '@/ProcessManager'
 
 import { PerfectScrollbar } from 'vue2-perfect-scrollbar'
 import Window from '@/components/Window'
@@ -82,7 +81,7 @@ export default {
     connect (conn) {
       conn.status = 'connecting'
 
-      SSHFSProcessManager.create(conn).then(pid => {
+      ProcessManager.create(conn).then(pid => {
         conn.pid = pid
         conn.status = 'connected'
       }).catch(error => {
@@ -95,7 +94,7 @@ export default {
     disconnect (conn) {
       conn.status = 'disconnecting'
 
-      SSHFSProcessManager.terminate(conn.pid).then(() => {
+      ProcessManager.terminate(conn.pid).then(() => {
         conn.status = 'disconnected'
       })
     },
@@ -242,8 +241,7 @@ export default {
   },
 
   mounted () {
-    SSHFSProcessManager.on('terminated', pid => {
-      console.log('Event "terminated" emmited')
+    ProcessManager.on('terminated', pid => {
       let conn = this.getConnectionByPid(pid)
 
       if (conn) {
@@ -252,8 +250,7 @@ export default {
       }
     })
 
-    SSHFSProcessManager.on('not-found', pid => {
-      console.log('Event "not-found" emmited')
+    ProcessManager.on('not-found', pid => {
       let conn = this.getConnectionByPid(pid)
 
       if (conn) {
@@ -262,10 +259,6 @@ export default {
 
         this.notify(`'${conn.name}' was disconnected due to a connection error.\nCheck your internet connection`, 'error-icon')
       }
-    })
-
-    SSHFSProcessManager.on('created', conn => {
-      console.log('Event "created" emmited')
     })
   }
 }
