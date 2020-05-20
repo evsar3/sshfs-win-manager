@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { remote, shell } from 'electron'
+import { remote } from 'electron'
 
 import ProcessManager from '@/ProcessManager'
 
@@ -100,7 +100,7 @@ export default {
     },
 
     openLocal (path) {
-      shell.openItem(path)
+      remote.shell.openItem(path)
     },
 
     addNewConnection () {
