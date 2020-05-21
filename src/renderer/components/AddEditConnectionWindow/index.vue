@@ -1,60 +1,67 @@
 <template>
   <Window :title="title">
     <div class="wrap">
-      <div class="form-item">
-        <label>Name</label>
-        <input type="text" autofocus placeholder="eg. My development server 1" v-model="conn.name">
-      </div>
+      <Tabs>
+        <Tab label="BASIC" :active="true">
+          <div class="form-item">
+            <label>Name</label>
+            <input type="text" autofocus placeholder="eg. My development server 1" v-model="conn.name">
+          </div>
 
-      <h1 class="section-title">Connection</h1>
-      <div class="form-row">
-        <div class="form-item">
-          <label>IP/Host</label>
-          <input type="text" placeholder="eg. 127.0.0.1 or my.domain.com" v-model="conn.host">
-        </div>
-        <div class="form-item" style="flex: 0 0 80px">
-          <label>Port</label>
-          <input type="text" placeholder="eg. 22" v-model.number="conn.port">
-        </div>
-      </div>
-      <div class="form-item">
-        <label>User</label>
-        <input type="text" placeholder="eg. root" v-model="conn.user">
-      </div>
-      <div class="form-item">
-        <label>Authentication method</label>
-        <select v-model="conn.authType">
-          <option value="password">Password</option>
-          <option value="key-file">Private Key (file)</option>
-          <!-- <option value="key-input" disabled>Private Key (input)</option> -->
-        </select>
-      </div>
-      <div v-show="conn.authType === 'password'" class="form-item">
-        <label>Password</label>
-        <input type="password" v-model="conn.password">
-      </div>
-      <div v-show="conn.authType === 'key-file'" class="form-item">
-        <label>Key File</label>
-        <input type="text" placeholder="eg. C:\Users\me\.ssh\id_rsa.pub" v-model="conn.keyFile">
-      </div>
-      <div v-show="conn.authType === 'key-input'" class="form-item">
-        <label>Key</label>
-        <textarea placeholder="eg. ssh-rsa AAAAB3Nz..." v-model="conn.key"></textarea>
-      </div>
+          <h1 class="section-title">Connection</h1>
+          <div class="form-row">
+            <div class="form-item">
+              <label>IP/Host</label>
+              <input type="text" placeholder="eg. 127.0.0.1 or my.domain.com" v-model="conn.host">
+            </div>
+            <div class="form-item" style="flex: 0 0 80px">
+              <label>Port</label>
+              <input type="text" placeholder="eg. 22" v-model.number="conn.port">
+            </div>
+          </div>
+          <div class="form-item">
+            <label>User</label>
+            <input type="text" placeholder="eg. root" v-model="conn.user">
+          </div>
+          <div class="form-item">
+            <label>Authentication method</label>
+            <select v-model="conn.authType">
+              <option value="password">Password</option>
+              <option value="key-file">Private Key (file)</option>
+              <!-- <option value="key-input" disabled>Private Key (input)</option> -->
+            </select>
+          </div>
+          <div v-show="conn.authType === 'password'" class="form-item">
+            <label>Password</label>
+            <input type="password" v-model="conn.password">
+          </div>
+          <div v-show="conn.authType === 'key-file'" class="form-item">
+            <label>Key File</label>
+            <input type="text" placeholder="eg. C:\Users\me\.ssh\id_rsa.pub" v-model="conn.keyFile">
+          </div>
+          <div v-show="conn.authType === 'key-input'" class="form-item">
+            <label>Key</label>
+            <textarea placeholder="eg. ssh-rsa AAAAB3Nz..." v-model="conn.key"></textarea>
+          </div>
 
-      <h1 class="section-title">Remote</h1>
-      <div class="form-item">
-        <label>Path</label>
-        <input type="text" placeholder="eg. /home/john" v-model="conn.folder">
-      </div>
+          <h1 class="section-title">Remote</h1>
+          <div class="form-item">
+            <label>Path</label>
+            <input type="text" placeholder="eg. /home/john" v-model="conn.folder">
+          </div>
 
-      <h1 class="section-title">Local</h1>
-      <div class="form-item">
-        <label>Drive letter</label>
-        <select v-model="conn.mountPoint">
-          <option v-for="drive in drives" :value="drive + ':'" :key="drive">{{drive}}:</option>
-        </select>
-      </div>
+          <h1 class="section-title">Local</h1>
+          <div class="form-item">
+            <label>Drive letter</label>
+            <select v-model="conn.mountPoint">
+              <option v-for="drive in drives" :value="drive + ':'" :key="drive">{{drive}}:</option>
+            </select>
+          </div>
+        </Tab>
+        <Tab label="ADVANCED">
+          <h1>Advanced configs</h1>
+        </Tab>
+      </Tabs>
 
       <div class="footer">
         <button class="btn" @click="cancel">Cancel</button>
@@ -69,6 +76,8 @@ import { remote } from 'electron'
 import { v4 as uuid } from 'uuid'
 
 import Window from '@/components/Window'
+import Tabs from '@/components/Tabs/Tabs'
+import Tab from '@/components/Tabs/Tab'
 
 const windowManager = remote.require('electron-window-manager')
 
@@ -76,7 +85,9 @@ export default {
   name: 'add-edit-connection-window',
 
   components: {
-    Window
+    Window,
+    Tabs,
+    Tab
   },
 
   methods: {
