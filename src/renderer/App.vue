@@ -27,10 +27,10 @@ export default {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Segoe WPC', 'Segoe UI', 'Arial', sans-serif;
 }
 
 body {
-  font-family: 'Segoe WPC', 'Segoe UI', 'Arial', sans-serif;
   cursor: default;
   user-select: none;
 }
@@ -60,14 +60,21 @@ button.btn {
   &.active,
   &.default {
     background: lighten(@primary-color, 3%);
+    color: contrast(@primary-color);
   }
 
   &:hover {
     background: @primary-color;
+    color: contrast(@primary-color);
+
+    svg {
+      fill: contrast(@primary-color);
+    }
   }
 
   &:active {
     background: darken(@primary-color, 5%);
+    color: contrast(@primary-color);
   }
 
   &:disabled {

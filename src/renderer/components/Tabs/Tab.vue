@@ -1,5 +1,5 @@
 <template>
-  <div v-show="active">
+  <div class="tab" v-show="active">
       <slot></slot>
   </div>
 </template>
@@ -21,3 +21,9 @@ export default {
   }
 }
 </script>
+
+<style lang="less" scoped>
+.tab {
+  padding-top: 15px;
+}
+</style>

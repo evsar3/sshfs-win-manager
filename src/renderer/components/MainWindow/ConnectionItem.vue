@@ -181,6 +181,10 @@ export default {
 
       &:hover {
         background: @primary-color;
+
+        svg {
+          fill: contrast(@primary-color);
+        }
       }
 
       &:active {
