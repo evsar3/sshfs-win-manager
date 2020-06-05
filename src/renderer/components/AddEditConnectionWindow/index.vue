@@ -2,7 +2,7 @@
   <Window :title="title">
     <div class="wrap">
       <Tabs>
-        <Tab label="BASIC" :active="true">
+        <Tab label="BASIC" active>
           <div class="form-item">
             <label>Name</label>
             <input type="text" autofocus placeholder="eg. My development server 1" v-model="conn.name">
@@ -59,7 +59,11 @@
           </div>
         </Tab>
         <Tab label="ADVANCED">
-          <h1>Advanced configs</h1>
+          <div class="form-item">
+            <label>Custom Command Line params <toggle-button style="float: right;" :color="toggleButtonColor" labels v-model="conn.advanced.customCmdlOptionsEnabled"></toggle-button></label>
+            
+            <CustomCmdlOptions :list="conn.advanced.customCmdlOptions"/>
+          </div>
         </Tab>
       </Tabs>
 
@@ -75,9 +79,12 @@
 import { remote } from 'electron'
 import { v4 as uuid } from 'uuid'
 
+import { ToggleButton } from 'vue-js-toggle-button'
+
 import Window from '@/components/Window'
 import Tabs from '@/components/Tabs/Tabs'
 import Tab from '@/components/Tabs/Tab'
+import CustomCmdlOptions from './CustomCmdlOptions'
 
 const windowManager = remote.require('electron-window-manager')
 
@@ -87,7 +94,9 @@ export default {
   components: {
     Window,
     Tabs,
-    Tab
+    Tab,
+    CustomCmdlOptions,
+    ToggleButton
   },
 
   methods: {
@@ -113,6 +122,11 @@ export default {
       title: 'Add Connection',
       drives: 'EFGHIJKLMNOPQRSTUVWXYZ',
 
+      toggleButtonColor: {
+        checked: '#2486d8',
+        unchecked: 'rgba(255, 255, 255, 0.1)'
+      },
+
       conn: {
         uuid: uuid(),
         name: '',
@@ -126,7 +140,11 @@ export default {
         key: '',
         mountPoint: 'E:',
         status: 'disconnected',
-        pid: 0
+        pid: 0,
+        advanced: {
+          customCmdlOptionsEnabled: false,
+          customCmdlOptions: []
+        }
       }
     }
   },
