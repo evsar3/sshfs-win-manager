@@ -17,7 +17,7 @@ class ProcessHandlerWin {
         '-ogid=-1',
         '-oumask=000',
         '-ocreate_umask=000',
-        `-ovolname=${conn.name}`,
+        `-ovolname=${conn.name.substr(0, 32)}`,
         '-omax_readahead=1GB',
         '-oStrictHostKeyChecking=no',
         '-oUserKnownHostsFile=/dev/null',
