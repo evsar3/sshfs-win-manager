@@ -60,7 +60,7 @@
         </Tab>
         <Tab label="ADVANCED">
           <div class="form-item">
-            <label>Custom Command Line params <toggle-button style="float: right;" :color="toggleButtonColor" labels v-model="conn.advanced.customCmdlOptionsEnabled"></toggle-button></label>
+            <label>Custom Command Line params <toggle-button style="float: right;" :color="toggleButtonColor" v-model="conn.advanced.customCmdlOptionsEnabled" sync labels></toggle-button></label>
             
             <CustomCmdlOptions :list="conn.advanced.customCmdlOptions"/>
           </div>
