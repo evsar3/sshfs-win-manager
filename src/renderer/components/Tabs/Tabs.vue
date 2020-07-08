@@ -1,7 +1,7 @@
 <template>
   <div class="tabs-container">
     <div class="tabs-selector">
-      <button v-for="tab in tabs" :key="tab.label" class="tab-selector" :class="{'tab-selector--selected': tab.active}" @click="select(tab)">
+      <button v-for="tab in tabs" :key="tab.label" class="tab-selector" :class="{'tab-selector--selected': tab.isActive}" @click="select(tab)">
         {{tab.label}}
       </button>
     </div>
@@ -17,10 +17,10 @@ export default {
   methods: {
     select (tab) {
       this.tabs.forEach(tab => {
-        tab.active = false
+        tab.isActive = false
       })
 
-      tab.active = true
+      tab.isActive = true
     }
   },
 

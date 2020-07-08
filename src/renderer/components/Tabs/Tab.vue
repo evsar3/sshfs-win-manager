@@ -1,5 +1,5 @@
 <template>
-  <div class="tab" v-show="active">
+  <div class="tab" v-show="isActive">
       <slot></slot>
   </div>
 </template>
@@ -17,6 +17,12 @@ export default {
     label: {
       required: true,
       type: String
+    }
+  },
+
+  data () {
+    return {
+      isActive: this.active
     }
   }
 }
