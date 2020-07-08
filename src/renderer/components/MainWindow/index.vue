@@ -105,7 +105,7 @@ export default {
 
     addNewConnection () {
       const window = windowManager.createNew('add-new-connection-window', '', '/index.html#add-new-connection', null, {
-        height: 750,
+        height: 770,
         width: 500,
         useContentSize: true,
         frame: false,
@@ -123,7 +123,7 @@ export default {
 
     editConnection (conn) {
       const window = windowManager.createNew('edit-connection-window', '', `/index.html#edit-connection/${conn.uuid}`, null, {
-        height: 750,
+        height: 770,
         width: 500,
         useContentSize: true,
         frame: false,
