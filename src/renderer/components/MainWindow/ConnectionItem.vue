@@ -38,6 +38,10 @@
         <Icon icon="trashCan"/>
       </button>
 
+      <button v-tooltip="'Duplicate connection'" v-show="showEditButton" @click="$emit('clone', conn)">
+        <Icon icon="duplicate"/>
+      </button>
+
       <button v-show="showEditButton" class="success" @click="$emit('edit', conn)">
         <Icon icon="pen"/>
       </button>

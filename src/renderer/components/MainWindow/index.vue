@@ -7,7 +7,7 @@
           <p>Try clicking at 'Add Server' in the panel aside</p>
         </div>
 
-        <ConnectionItem v-for="conn in connections" :key="conn.uuid" :conn="conn" :mode="listMode" @connect="connect" @disconnect="disconnect" @open="openLocal" @edit="editConnection" @delete="deleteConnection"/>
+        <ConnectionItem v-for="conn in connections" :key="conn.uuid" :conn="conn" :mode="listMode" @connect="connect" @disconnect="disconnect" @open="openLocal" @edit="editConnection" @delete="deleteConnection" @clone="cloneConnection"/>
       </PerfectScrollbar>
 
       <div class="actions">
@@ -48,6 +48,8 @@
 
 <script>
 import { remote } from 'electron'
+
+import { v4 as uuid } from 'uuid'
 
 import ProcessManager from '@/ProcessManager'
 
@@ -137,6 +139,17 @@ export default {
       window.object.once('ready-to-show', () => {
         window.object.show()
       })
+    },
+
+    cloneConnection (conn) {
+      const connCopy = {...conn}
+
+      const randName = Math.random().toString(30).substr(-4)
+
+      connCopy.uuid = uuid()
+      connCopy.name += ` (copy-${randName})`
+
+      this.$store.dispatch('ADD_CONNECTION', connCopy)
     },
 
     deleteConnection (conn) {
