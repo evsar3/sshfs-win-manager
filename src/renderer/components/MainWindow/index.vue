@@ -164,7 +164,7 @@ export default {
 
     settings () {
       const window = windowManager.createNew('settings-window', '', '/index.html#settings', null, {
-        height: 210,
+        height: 250,
         width: 500,
         useContentSize: true,
         frame: false,

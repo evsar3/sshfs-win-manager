@@ -6,10 +6,8 @@
         <input type="text" autofocus placeholder="eg. C:\Program Files\SSHFS-Win\bin\sshfs-win.exe" v-model="data.sshfsBinary">
       </div>
 
-      <div class="form-item">
-        <label>
-          <input type="checkbox" v-model="data.startupWithOS"> <span>Startup with windows</span>
-        </label>
+      <div class="form-item" style="margin: 10px 0">
+        <label>Startup with windows <toggle-button style="float: right;" :color="toggleButtonColor" v-model="data.startupWithOS" sync labels></toggle-button></label>
       </div>
 
       <div class="footer">
@@ -25,6 +23,8 @@ import { remote } from 'electron'
 
 import Window from '@/components/Window'
 
+import { ToggleButton } from 'vue-js-toggle-button'
+
 const windowManager = remote.require('electron-window-manager')
 const app = remote.require('electron').app
 
@@ -32,7 +32,8 @@ export default {
   name: 'settings-window',
 
   components: {
-    Window
+    Window,
+    ToggleButton
   },
 
   methods: {
@@ -62,6 +63,10 @@ export default {
 
   data () {
     return {
+      toggleButtonColor: {
+        checked: '#2486d8',
+        unchecked: 'rgba(255, 255, 255, 0.1)'
+      },
       loginItemSettings: {
         args: [
           '--systray'
