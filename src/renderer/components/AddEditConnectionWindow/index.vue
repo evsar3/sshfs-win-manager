@@ -37,7 +37,7 @@
           </div>
           <div v-show="conn.authType === 'key-file'" class="form-item">
             <label>Key File</label>
-            <input type="text" placeholder="eg. C:\Users\me\.ssh\id_rsa.pub" v-model="conn.keyFile">
+            <input type="text" placeholder="eg. C:\Users\me\.ssh\id_rsa" v-model="conn.keyFile">
           </div>
           <div v-show="conn.authType === 'key-input'" class="form-item">
             <label>Key</label>
