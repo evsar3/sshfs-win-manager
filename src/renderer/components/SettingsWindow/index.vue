@@ -7,7 +7,12 @@
       </div>
 
       <div class="form-item" style="margin: 10px 0">
-        <label>Startup with windows <toggle-button style="float: right;" :color="toggleButtonColor" v-model="data.startupWithOS" sync labels></toggle-button></label>
+        <div class="check-item">
+          <label>Startup with windows <toggle-button :color="toggleButtonColor" v-model="data.startupWithOS" sync labels></toggle-button></label>
+        </div>
+        <div class="check-item">
+          <label>Display system tray message on close <toggle-button :color="toggleButtonColor" v-model="data.displayTrayMessageOnClose" sync labels></toggle-button></label>
+        </div>
       </div>
 
       <div class="footer">
@@ -86,6 +91,11 @@ export default {
 <style lang="less" scoped>
 .wrap {
   padding: 15px 20px;
+
+  .form-item .check-item .vue-js-switch {
+    float: right;
+    clear: both;
+  }
 
   .footer {
     position: fixed;

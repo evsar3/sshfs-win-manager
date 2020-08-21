@@ -164,7 +164,7 @@ export default {
 
     settings () {
       const window = windowManager.createNew('settings-window', '', '/index.html#settings', null, {
-        height: 250,
+        height: 265,
         width: 500,
         useContentSize: true,
         frame: false,
@@ -200,9 +200,11 @@ export default {
 
     showRunningInBackgroundNotification () {
       if (!this.runningInBackgroundNotificationShowed) {
-        this.notify('Program still running in the system tray')
-
-        this.runningInBackgroundNotificationShowed = true
+        if (this.$store.state.Settings.settings.displayTrayMessageOnClose) {
+          this.notify('Program still running in the system tray')
+          
+          this.runningInBackgroundNotificationShowed = true
+        }
       }
     },
 

@@ -1,7 +1,8 @@
 const state = {
   settings: {
     sshfsBinary: 'C:\\Program Files\\SSHFS-Win\\bin\\sshfs-win.exe',
-    startupWithOS: true
+    startupWithOS: true,
+    displayTrayMessageOnClose: true
   }
 }
 
@@ -13,7 +14,8 @@ const mutations = {
   RESET_SETTINGS (state) {
     state.settings = {
       sshfsBinary: 'C:\\Program Files\\SSHFS-Win\\bin\\sshfs-win.exe',
-      startupWithOS: true
+      startupWithOS: true,
+      displayTrayMessageOnClose: true
     }
   }
 }
