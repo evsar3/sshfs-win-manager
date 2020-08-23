@@ -31,6 +31,17 @@ const mutations = {
 
   CLEAR_CONNECTIONS (state) {
     state.connections = []
+  },
+
+  MIGRATE_CONNECTIONS_ADVANCED_OPTIONS (state) {
+    state.connections.forEach(conn => {
+      if (!conn.advanced) {
+        conn.advanced = {
+          customCmdlOptionsEnabled: false,
+          customCmdlOptions: []
+        }
+      }
+    })
   }
 }
 
@@ -53,6 +64,10 @@ const actions = {
 
   CLEAR_CONNECTIONS ({ commit }) {
     commit('CLEAR_CONNECTIONS')
+  },
+
+  APPLY_CONNECTIONS_MIGRATIONS ({ commit }) {
+    commit('MIGRATE_CONNECTIONS_ADVANCED_OPTIONS')
   }
 }
 
