@@ -202,7 +202,7 @@ export default {
       if (!this.runningInBackgroundNotificationShowed) {
         if (this.$store.state.Settings.settings.displayTrayMessageOnClose) {
           this.notify('Program still running in the system tray')
-          
+
           this.runningInBackgroundNotificationShowed = true
         }
       }

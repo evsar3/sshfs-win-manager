@@ -7,7 +7,7 @@ class ProcessHandlerWin {
 
   create (conn) {
     return new Promise((resolve, reject) => {
-      const cmdArgs = [
+      let cmdArgs = [
         'cmd',
         `${conn.user}@${conn.host}:${conn.folder}`,
         conn.mountPoint,
@@ -25,6 +25,27 @@ class ProcessHandlerWin {
         '-olarge_read',
         '-okernel_cache'
       ]
+
+      if (conn.advanced.customCmdlOptionsEnabled) {
+        let optionalArgs = []
+
+        conn.advanced.customCmdlOptions.forEach(arg => {
+          cmdArgs = cmdArgs.filter(a => a.substr(2, arg.name.length) !== arg.name)
+
+          if (arg.value !== '') {
+            optionalArgs.push(`-o${arg.name}=${arg.value}`)
+          } else {
+            optionalArgs.push(`-o${arg.name}`)
+          }
+        })
+
+        cmdArgs = [
+          ...cmdArgs,
+          ...optionalArgs
+        ]
+      }
+
+      console.log(cmdArgs)
 
       if (conn.authType === 'password') {
         cmdArgs.push('-oPreferredAuthentications=password')

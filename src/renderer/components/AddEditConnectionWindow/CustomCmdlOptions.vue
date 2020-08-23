@@ -1,15 +1,15 @@
 <template>
   <div class="custom-cmdl-list">
-    <h1 v-if="params.length === 0" class="no-data">No params added yet</h1>
+    <h1 v-if="value.length === 0" class="no-data">No params added yet</h1>
 
-    <div v-for="param in params" :key="param.uuid">
+    <div v-for="param in value" :key="param.uuid">
       <div class="option">
-        <select v-model="param.name" class="option">
+        <select v-model="param.name" class="option" @input="emmitChanges">
           <option v-for="option in options" :key="option.name" :value="option.name" :selected="param.name === option.name">{{option.name}}</option>
         </select>
       </div>
       <div>
-        <input type="text" :placeholder="getOption(param.name).description" v-model="param.value">
+        <input type="text" :placeholder="getOption(param.name).description" v-model="param.value" :disabled="getOption(param.name).type === 'bool'" @input="emmitChanges">
       </div>
       <div class="remove">
         <button @click="removeParam(param)">
@@ -27,6 +27,8 @@ import { v4 as uuid } from 'uuid'
 
 import Icon from '@/components/Icon'
 
+import SshfsParamsList from '@/SshfsParamsList'
+
 export default {
   name: 'CustomCmdlOptions',
 
@@ -35,23 +37,28 @@ export default {
   },
 
   props: {
-    list: {
+    value: {
       type: Array,
-      required: true
+      required: false,
+      default: []
     }
   },
 
   methods: {
     addParam () {
-      this.params.push({
+      this.value.push({
         uuid: uuid(),
         name: '',
         value: ''
       })
+
+      this.emmitChanges()
     },
 
     removeParam (param) {
-      this.params = this.params.filter(a => a.uuid !== param.uuid)
+      this.value.splice(this.value.findIndex(a => a.uuid === param.uuid), 1)
+
+      this.emmitChanges()
     },
 
     getOption (name) {
@@ -66,75 +73,16 @@ export default {
       }
 
       return option
+    },
+
+    emmitChanges () {
+      this.$emit('input', this.value)
     }
   },
 
   data () {
     return {
-      params: this.list,
-
-      options: [
-        {
-          name: 'reconnect',
-          type: 'bool',
-          description: 'Reconnect to server'
-        },
-        {
-          name: 'delay_connect',
-          type: 'bool',
-          description: 'Delay connection to server'
-        },
-        {
-          name: 'sshfs_sync',
-          type: 'bool',
-          description: 'Synchronous writes'
-        },
-        {
-          name: 'no_readahead',
-          type: 'bool',
-          description: 'Synchronous reads (no speculative readahead)'
-        },
-        {
-          name: 'sshfs_debug',
-          type: 'bool',
-          description: 'Print some debugging information'
-        },
-        {
-          name: 'cache',
-          type: 'string',
-          description: 'Enable caching {yes,no} (default: yes)'
-        },
-        {
-          name: 'cache_timeout',
-          type: 'number',
-          description: 'Sets timeout for caches in seconds (default: 20)'
-        },
-        {
-          name: 'cache_stat_timeout',
-          type: 'number',
-          description: 'Sets timeout for stat cache'
-        },
-        {
-          name: 'cache_dir_timeout',
-          type: 'number',
-          description: 'Sets timeout for dir cache'
-        },
-        {
-          name: 'cache_link_timeout',
-          type: 'number',
-          description: 'Sets timeout for link cache'
-        },
-        {
-          name: 'workaround',
-          type: 'string',
-          description: 'Colon separated list of workarounds'
-        },
-        {
-          name: 'idmap',
-          type: 'string',
-          description: 'User/group ID mapping'
-        }
-      ]
+      options: SshfsParamsList
     }
   }
 }
@@ -145,6 +93,7 @@ export default {
   .no-data {
     font-size: 15pt;
     color: fade(contrast(@main-color), 20%);
+    margin: 9px 0;
   }
 
   > div {

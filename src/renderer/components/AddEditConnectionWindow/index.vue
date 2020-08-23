@@ -62,7 +62,7 @@
           <div class="form-item">
             <label>Custom Command Line params <toggle-button style="float: right;" :color="toggleButtonColor" v-model="conn.advanced.customCmdlOptionsEnabled" sync labels></toggle-button></label>
             
-            <CustomCmdlOptions :list="conn.advanced.customCmdlOptions"/>
+            <CustomCmdlOptions v-model="conn.advanced.customCmdlOptions"/>
           </div>
         </Tab>
       </Tabs>

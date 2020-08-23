@@ -90,6 +90,7 @@ button.btn {
     fill: contrast(@main-color);
     width: 22px;
     float: left;
+    margin-right: 5px;
   }
 }
 
