@@ -7,12 +7,8 @@
       </div>
 
       <div class="form-item" style="margin: 10px 0">
-        <div class="check-item">
-          <label>Startup with windows <toggle-button :color="toggleButtonColor" v-model="data.startupWithOS" sync labels></toggle-button></label>
-        </div>
-        <div class="check-item">
-          <label>Display system tray message on close <toggle-button :color="toggleButtonColor" v-model="data.displayTrayMessageOnClose" sync labels></toggle-button></label>
-        </div>
+        <SwitchLabel label="Startup with Windows" v-model="data.startupWithOS"/>
+        <SwitchLabel label="Display system tray message on close" v-model="data.displayTrayMessageOnClose"/>
       </div>
 
       <div class="footer">
@@ -27,8 +23,7 @@
 import { remote } from 'electron'
 
 import Window from '@/components/Window'
-
-import { ToggleButton } from 'vue-js-toggle-button'
+import SwitchLabel from '@/components/SwitchLabel'
 
 const windowManager = remote.require('electron-window-manager')
 const app = remote.require('electron').app
@@ -38,7 +33,7 @@ export default {
 
   components: {
     Window,
-    ToggleButton
+    SwitchLabel
   },
 
   methods: {
@@ -68,10 +63,6 @@ export default {
 
   data () {
     return {
-      toggleButtonColor: {
-        checked: '#2486d8',
-        unchecked: 'rgba(255, 255, 255, 0.1)'
-      },
       loginItemSettings: {
         args: [
           '--systray'
@@ -91,11 +82,6 @@ export default {
 <style lang="less" scoped>
 .wrap {
   padding: 15px 20px;
-
-  .form-item .check-item .vue-js-switch {
-    float: right;
-    clear: both;
-  }
 
   .footer {
     position: fixed;

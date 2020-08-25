@@ -60,7 +60,7 @@
         </Tab>
         <Tab label="ADVANCED">
           <div class="form-item">
-            <label>Custom Command Line params <toggle-button style="float: right;" :color="toggleButtonColor" v-model="conn.advanced.customCmdlOptionsEnabled" sync labels></toggle-button></label>
+            <SwitchLabel label="Custom Command Line params" v-model="conn.advanced.customCmdlOptionsEnabled"/>
             
             <CustomCmdlOptions v-model="conn.advanced.customCmdlOptions"/>
           </div>
@@ -79,11 +79,10 @@
 import { remote } from 'electron'
 import { v4 as uuid } from 'uuid'
 
-import { ToggleButton } from 'vue-js-toggle-button'
-
 import Window from '@/components/Window'
 import Tabs from '@/components/Tabs/Tabs'
 import Tab from '@/components/Tabs/Tab'
+import SwitchLabel from '@/components/SwitchLabel'
 import CustomCmdlOptions from './CustomCmdlOptions'
 
 const windowManager = remote.require('electron-window-manager')
@@ -95,8 +94,8 @@ export default {
     Window,
     Tabs,
     Tab,
-    CustomCmdlOptions,
-    ToggleButton
+    SwitchLabel,
+    CustomCmdlOptions
   },
 
   methods: {
@@ -121,11 +120,6 @@ export default {
 
       title: 'Add Connection',
       drives: 'EFGHIJKLMNOPQRSTUVWXYZ',
-
-      toggleButtonColor: {
-        checked: '#2486d8',
-        unchecked: 'rgba(255, 255, 255, 0.1)'
-      },
 
       conn: {
         uuid: uuid(),
