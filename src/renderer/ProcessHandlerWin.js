@@ -23,7 +23,8 @@ class ProcessHandlerWin {
         '-oUserKnownHostsFile=/dev/null',
         '-oallow_other',
         '-olarge_read',
-        '-okernel_cache'
+        '-okernel_cache',
+        '-ofollow_symlinks'
       ]
 
       if (conn.advanced.customCmdlOptionsEnabled) {
