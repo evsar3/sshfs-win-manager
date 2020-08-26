@@ -1,5 +1,5 @@
 <template>
-  <Window :title="`Password for ${conn.user}@${conn.host}`">
+  <Window :title="`Password for ${conn.user}@${conn.host}`" @close="cancel">
     <div class="wrap">
       <div class="form-item">
         <label>Password</label>
