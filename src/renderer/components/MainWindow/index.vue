@@ -83,14 +83,48 @@ export default {
     connect (conn) {
       conn.status = 'connecting'
 
-      ProcessManager.create(conn).then(pid => {
-        conn.pid = pid
-        conn.status = 'connected'
-      }).catch(error => {
-        conn.status = 'disconnected'
+      const connect = c => {
+        ProcessManager.create(c).then(pid => {
+          conn.pid = pid
+          conn.status = 'connected'
+        }).catch(error => {
+          conn.status = 'disconnected'
 
-        this.notify(`Can't connect to '${conn.name}': ${error}`, 'error-icon')
-      })
+          this.notify(`Can't connect to '${conn.name}': ${error}`, 'error-icon')
+        })
+      }
+
+      if (conn.authType === 'password-ask') {
+        const window = windowManager.createNew('password-prompt-window', '', `/index.html#password-prompt/${conn.uuid}`, null, {
+          height: 190,
+          width: 350,
+          useContentSize: true,
+          frame: false,
+          maximizable: false,
+          minimizable: false,
+          resizable: false,
+          modal: true,
+          parent: windowManager.get('main-window').object
+        }).create()
+
+        window.object.once('ready-to-show', () => {
+          window.object.show()
+        })
+
+        windowManager.bridge.once('main-window-message', data => {
+          switch (data.message) {
+            case 'connection-password':
+              connect(data.conn)
+              break
+
+            case 'connection-password-cancel':
+              conn.status = 'disconnected'
+              break
+          }
+        })
+      } else {
+        connect(conn)
+      }
     },
 
     disconnect (conn) {

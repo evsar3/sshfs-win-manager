@@ -48,7 +48,7 @@ class ProcessHandlerWin {
 
       console.log(cmdArgs)
 
-      if (conn.authType === 'password') {
+      if (conn.authType === 'password' || conn.authType === 'password-ask') {
         cmdArgs.push('-oPreferredAuthentications=password')
         cmdArgs.push('-opassword_stdin')
       }
@@ -60,7 +60,7 @@ class ProcessHandlerWin {
 
       const childProcess = spawn(this.settings.sshfsBinary, cmdArgs)
 
-      if (conn.authType === 'password') {
+      if (conn.authType === 'password' || conn.authType === 'password-ask') {
         childProcess.stdin.write(conn.password + '\n')
       }
 

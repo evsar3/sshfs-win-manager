@@ -25,8 +25,9 @@
           </div>
           <div class="form-item">
             <label>Authentication method</label>
-            <select v-model="conn.authType">
+            <select v-model="conn.authType" @change="authTypeChange">
               <option value="password">Password</option>
+              <option value="password-ask">Password (ask on connect)</option>
               <option value="key-file">Private Key (file)</option>
               <!-- <option value="key-input" disabled>Private Key (input)</option> -->
             </select>
@@ -111,6 +112,11 @@ export default {
       }
 
       windowManager.closeCurrent()
+    },
+
+    authTypeChange () {
+      this.conn.password = ''
+      this.conn.keyFile = process.env.USERPROFILE + '\\.ssh\\id_rsa'
     }
   },
 

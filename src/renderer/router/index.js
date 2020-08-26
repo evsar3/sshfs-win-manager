@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import MainWindow from '@/components/MainWindow/index'
 import AddEditConnectionWindow from '@/components/AddEditConnectionWindow/index'
 import SettingsWindow from '@/components/SettingsWindow/index'
+import PasswordPromptWindow from '@/components/PasswordPromptWindow/index'
 import AboutWindow from '@/components/AboutWindow/index'
 
 Vue.use(Router)
@@ -29,6 +30,11 @@ export default new Router({
       path: '/settings',
       name: 'settings',
       component: SettingsWindow
+    },
+    {
+      path: '/password-prompt/:uuid',
+      name: 'password-prompt',
+      component: PasswordPromptWindow
     },
     {
       path: '/about',
