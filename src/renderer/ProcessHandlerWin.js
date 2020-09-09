@@ -13,19 +13,7 @@ class ProcessHandlerWin {
         `${conn.user}@${conn.host}:${conn.folder}`,
         conn.mountPoint,
         `-p${conn.port}`,
-        '-oidmap=user',
-        '-ouid=-1',
-        '-ogid=-1',
-        '-oumask=000',
-        '-ocreate_umask=000',
-        `-ovolname=${conn.name.substr(0, 32)}`,
-        '-omax_readahead=1GB',
-        '-oStrictHostKeyChecking=no',
-        '-oUserKnownHostsFile=/dev/null',
-        '-oallow_other',
-        '-olarge_read',
-        '-okernel_cache',
-        '-ofollow_symlinks'
+        `-ovolname=${conn.name.substr(0, 32)}`
       ]
 
       if (!fs.existsSync(this.settings.sshfsBinary)) {
@@ -48,6 +36,24 @@ class ProcessHandlerWin {
         cmdArgs = [
           ...cmdArgs,
           ...optionalArgs
+        ]
+      } else {
+        cmdArgs = [
+          ...cmdArgs,
+          ...[
+            '-oidmap=user',
+            '-ouid=-1',
+            '-ogid=-1',
+            '-oumask=000',
+            '-ocreate_umask=000',
+            '-omax_readahead=1GB',
+            '-oStrictHostKeyChecking=no',
+            '-oUserKnownHostsFile=/dev/null',
+            '-oallow_other',
+            '-olarge_read',
+            '-okernel_cache',
+            '-ofollow_symlinks'
+          ]
         ]
       }
 
