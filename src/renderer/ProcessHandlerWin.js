@@ -1,4 +1,5 @@
 import { spawn, exec } from 'child_process'
+import fs from 'fs'
 
 class ProcessHandlerWin {
   constructor (settings) {
@@ -26,6 +27,10 @@ class ProcessHandlerWin {
         '-okernel_cache',
         '-ofollow_symlinks'
       ]
+
+      if (!fs.existsSync(this.settings.sshfsBinary)) {
+        reject(new Error(`SSHFS-Win binary not found at "${this.settings.sshfsBinary}". Check your settings`)); return
+      }
 
       if (conn.advanced.customCmdlOptionsEnabled) {
         let optionalArgs = []

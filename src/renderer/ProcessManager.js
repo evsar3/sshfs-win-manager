@@ -17,6 +17,8 @@ class ProcessManager extends EventEmitter {
   }
 
   create (conn) {
+    this.processHandler.settings = store.state.Settings.settings
+
     this.timeoutTimer = setTimeout(() => {
       this.emit('timeout', conn)
     }, (this.processHandler.settings.processTrackTimeout * 1000))
