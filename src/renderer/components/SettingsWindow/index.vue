@@ -6,6 +6,11 @@
         <input type="text" autofocus placeholder="eg. C:\Program Files\SSHFS-Win\bin\sshfs-win.exe" v-model="data.sshfsBinary">
       </div>
 
+      <div class="form-item">
+        <label>Process Timeout</label>
+        <input type="text" autofocus placeholder="Time in seconds" v-model.number="data.processTrackTimeout" style="width: 100px; text-align: right;">
+      </div>
+
       <div class="form-item" style="margin: 10px 0">
         <SwitchLabel label="Startup with Windows" v-model="data.startupWithOS"/>
         <SwitchLabel label="Display system tray message on close" v-model="data.displayTrayMessageOnClose"/>

@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import fs from 'fs'
 import { remote } from 'electron'
 
 import { v4 as uuid } from 'uuid'
@@ -198,7 +199,7 @@ export default {
 
     settings () {
       const window = windowManager.createNew('settings-window', '', '/index.html#settings', null, {
-        height: 265,
+        height: 340,
         width: 500,
         useContentSize: true,
         frame: false,
@@ -307,6 +308,28 @@ export default {
         conn.status = 'disconnected'
 
         this.notify(`'${conn.name}' was disconnected due to a connection error.\nCheck your internet connection`, 'error-icon')
+      }
+    })
+
+    ProcessManager.on('timeout', conn => {
+      if (fs.existsSync(conn.mountPoint)) {
+        ProcessManager.getLastSpawnedProcess().then(process => {
+          let foundConnection = this.connections.find(i => i.pid === process.pid)
+
+          if (!foundConnection) {
+            conn.pid = process.pid
+            conn.status = 'connected'
+
+            ProcessManager.watch(process.pid)
+
+            this.notify(`'${conn.name}' tracked using alternative method`)
+          }
+        })
+      } else {
+        conn.pid = null
+        conn.status = 'disconnected'
+
+        this.notify(`Process Timeout: Couldn't connect to '${conn.name}'`, 'error-icon')
       }
     })
   }

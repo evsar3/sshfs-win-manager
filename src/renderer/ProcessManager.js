@@ -17,6 +17,10 @@ class ProcessManager extends EventEmitter {
   }
 
   create (conn) {
+    this.timeoutTimer = setTimeout(() => {
+      this.emit('timeout', conn)
+    }, (this.processHandler.settings.processTrackTimeout * 1000))
+
     return new Promise((resolve, reject) => {
       this.processHandler.create(conn).then((pid, process) => {
         this.emit('created', {
@@ -32,6 +36,8 @@ class ProcessManager extends EventEmitter {
         resolve(pid)
       }).catch(error => {
         reject(error)
+      }).finally(() => {
+        clearTimeout(this.timeoutTimer)
       })
     })
   }
@@ -78,6 +84,10 @@ class ProcessManager extends EventEmitter {
 
   exists (pid) {
     return this.processHandler.exists(pid)
+  }
+
+  getLastSpawnedProcess () {
+    return this.processHandler.getLastSpawnedProcess()
   }
 }
 

@@ -46,8 +46,6 @@ class ProcessHandlerWin {
         ]
       }
 
-      console.log(cmdArgs)
-
       if (conn.authType === 'password' || conn.authType === 'password-ask') {
         cmdArgs.push('-oPreferredAuthentications=password')
         cmdArgs.push('-opassword_stdin')
@@ -113,6 +111,44 @@ class ProcessHandlerWin {
       exec(`wmic process where '(name="sshfs.exe" and parentprocessid=${parentPid})' get processid /value`, (err, stdout) => {
         if (!err) {
           resolve(parseInt(stdout.toString().trim().split('=')[1]))
+        } else {
+          reject(new Error('Process not found'))
+        }
+      })
+    })
+  }
+
+  getLastSpawnedProcess () {
+    return new Promise((resolve, reject) => {
+      exec(`wmic process where '(name="sshfs.exe")' get processid, creationdate /value`, (err, stdout) => {
+        if (!err) {
+          let data = stdout.toString().trim().split('\n')
+          let pid = null
+          let creationDate = null
+
+          data.forEach(item => {
+            let itemParts = item.split('=')
+
+            let key = itemParts[0].trim().toLowerCase()
+            let value = itemParts[1].trim().toLowerCase()
+
+            if (key === 'processid') {
+              pid = parseInt(value)
+            }
+
+            if (key === 'creationdate') {
+              let year = parseInt(value.substr(0, 4))
+              let month = parseInt(value.substr(4, 2)) - 1
+              let day = parseInt(value.substr(6, 2))
+              let hours = parseInt(value.substr(8, 2))
+              let minutes = parseInt(value.substr(10, 2))
+              let seconds = parseInt(value.substr(13, 2))
+
+              creationDate = new Date(year, month, day, hours, minutes, seconds)
+            }
+          })
+
+          resolve({ pid, creationDate })
         } else {
           reject(new Error('Process not found'))
         }
