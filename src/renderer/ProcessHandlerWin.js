@@ -13,7 +13,9 @@ class ProcessHandlerWin {
         `${conn.user}@${conn.host}:${conn.folder}`,
         conn.mountPoint,
         `-p${conn.port}`,
-        `-ovolname=${conn.name.substr(0, 32)}`
+        `-ovolname=${conn.name.substr(0, 32)}`,
+        '-oStrictHostKeyChecking=no',
+        '-oUserKnownHostsFile=/dev/null'
       ]
 
       if (!fs.existsSync(this.settings.sshfsBinary)) {
@@ -47,8 +49,6 @@ class ProcessHandlerWin {
             '-oumask=000',
             '-ocreate_umask=000',
             '-omax_readahead=1GB',
-            '-oStrictHostKeyChecking=no',
-            '-oUserKnownHostsFile=/dev/null',
             '-oallow_other',
             '-olarge_read',
             '-okernel_cache',
