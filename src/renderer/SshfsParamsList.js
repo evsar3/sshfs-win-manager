@@ -248,5 +248,25 @@ export default [
     name: 'sync_read',
     type: 'bool',
     description: 'Perform reads synchronously'
+  },
+  {
+    name: 'subdir',
+    type: 'string',
+    description: 'Prepend this directory to all paths (mandatory)'
+  },
+  {
+    name: 'rellinksa',
+    type: 'bool',
+    description: 'Transform absolute symlinks to relative'
+  },
+  {
+    name: 'from_code',
+    type: 'string',
+    description: 'Original encoding of file names (default: UTF-8)'
+  },
+  {
+    name: 'to_code',
+    type: 'string',
+    description: 'New encoding of the file names (default: ISO-8859-2)'
   }
 ]
