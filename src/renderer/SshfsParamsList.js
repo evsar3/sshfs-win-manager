@@ -108,5 +108,145 @@ export default [
     name: 'no_check_root',
     type: 'bool',
     description: 'Don\'t check for existence of "dir" on server'
+  },
+  {
+    name: 'allow_other',
+    type: 'bool',
+    description: 'Allow access to other users'
+  },
+  {
+    name: 'allow_root',
+    type: 'bool',
+    description: 'Allow access to root'
+  },
+  {
+    name: 'nonempty',
+    type: 'bool',
+    description: 'Allow mounts over non-empty file/dir'
+  },
+  {
+    name: 'default_permissions',
+    type: 'bool',
+    description: 'Enable permission checking by kernel'
+  },
+  {
+    name: 'fsname',
+    type: 'string',
+    description: 'Set filesystem name'
+  },
+  {
+    name: 'subtype',
+    type: 'string',
+    description: 'Set filesystem type'
+  },
+  {
+    name: 'large_read',
+    type: 'bool',
+    description: 'Issue large read requests (2.4 only)'
+  },
+  {
+    name: 'max_read',
+    type: 'number',
+    description: 'Set maximum size of read requests'
+  },
+  {
+    name: 'hard_remove',
+    type: 'bool',
+    description: 'Immediate removal (don\'t hide files)'
+  },
+  {
+    name: 'use_ino',
+    type: 'bool',
+    description: 'Let filesystem set inode numbers'
+  },
+  {
+    name: 'readdir_ino',
+    type: 'bool',
+    description: 'Try to fill in d_ino in readdir'
+  },
+  {
+    name: 'direct_io',
+    type: 'bool',
+    description: 'Use direct I/O'
+  },
+  {
+    name: 'kernel_cache',
+    type: 'bool',
+    description: 'Cache files in kernel'
+  },
+  {
+    name: 'auto_cache',
+    type: 'bool',
+    description: 'Enable caching based on modification times'
+  },
+  {
+    name: 'umask',
+    type: 'number',
+    description: 'Set file permissions (octal)'
+  },
+  {
+    name: 'uid',
+    type: 'number',
+    description: 'Set file owner'
+  },
+  {
+    name: 'gid',
+    type: 'number',
+    description: 'Set file group'
+  },
+  {
+    name: 'entry_timeout',
+    type: 'number',
+    description: 'Cache timeout for names (1.0s)'
+  },
+  {
+    name: 'negative_timeout',
+    type: 'number',
+    description: 'Cache timeout for deleted names (0.0s)'
+  },
+  {
+    name: 'attr_timeout',
+    type: 'number',
+    description: 'Cache timeout for attributes (1.0s)'
+  },
+  {
+    name: 'ac_attr_timeout',
+    type: 'number',
+    description: 'Auto cache timeout for attributes (attr_timeout)'
+  },
+  {
+    name: 'intr',
+    type: 'bool',
+    description: 'Allow requests to be interrupted'
+  },
+  {
+    name: 'intr_signal',
+    type: 'number',
+    description: 'Signal to send on interrupt (10)'
+  },
+  {
+    name: 'modules',
+    type: 'string',
+    description: 'Names of modules to push onto filesystem stack'
+  },
+  {
+    name: 'max_write',
+    type: 'number',
+    description: 'Set maximum size of write requests'
+  },
+  {
+    name: 'max_readahead',
+    type: 'number',
+    description: 'Set maximum readahead'
+  },
+  {
+    name: 'async_read',
+    type: 'bool',
+    description: 'Perform reads asynchronously (default)'
+  },
+  {
+    name: 'sync_read',
+    type: 'bool',
+    description: 'Perform reads synchronously'
   }
 ]
