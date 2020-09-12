@@ -1,16 +1,31 @@
 <template>
   <Window title="SSHFS-Win Manager" closeAction="hide" @close="showRunningInBackgroundNotification">
     <div class="wrap">
-      <PerfectScrollbar class="list">
-        <div v-if="!hasConnections" class="no-data">
-          <h1>No servers added yet</h1>
-          <p>Try clicking at 'Add Server' in the panel aside</p>
+      <div class="left">
+        <div class="connection-list">
+          <div v-if="!hasConnections" class="no-data">
+            <h1>No servers added yet</h1>
+            <p>Try clicking at 'Add Server' in the panel aside</p>
+          </div>
+
+          <ConnectionItem v-for="conn in connections" :key="conn.uuid" :conn="conn" :mode="listMode" @connect="connect" @disconnect="disconnect" @open="openLocal" @edit="editConnection" @delete="deleteConnection" @clone="cloneConnection"/>
         </div>
 
-        <ConnectionItem v-for="conn in connections" :key="conn.uuid" :conn="conn" :mode="listMode" @connect="connect" @disconnect="disconnect" @open="openLocal" @edit="editConnection" @delete="deleteConnection" @clone="cloneConnection"/>
-      </PerfectScrollbar>
+        <div v-show="appSettings.showDebugPanel" class="debug-panel">
+          <div class="title">DEBUG OUTPUT</div>
+          <div class="debug-actions">
+            <button v-tooltip="'Clear debug output'" @click="clearDebugOutput">
+              <Icon icon="unavailable"/>
+            </button>
+            <button v-tooltip="'Copy debug output to clipboard'" @click="copyDebugOutput">
+              <Icon icon="duplicate"/>
+            </button>
+          </div>
+          <textarea v-model="debugOutput" readonly ref="debugOutput"></textarea>
+        </div>
+      </div>
 
-      <div class="actions">
+      <div class="right">
         <button class="btn" :disabled="listMode !== 'none'" @click="addNewConnection">
           <Icon icon="plus"/>
           Add Connection
@@ -48,7 +63,7 @@
 
 <script>
 import fs from 'fs'
-import { remote } from 'electron'
+import { remote, clipboard } from 'electron'
 
 import { v4 as uuid } from 'uuid'
 
@@ -199,7 +214,7 @@ export default {
 
     settings () {
       const window = windowManager.createNew('settings-window', '', '/index.html#settings', null, {
-        height: 340,
+        height: 365,
         width: 500,
         useContentSize: true,
         frame: false,
@@ -258,6 +273,16 @@ export default {
 
     getConnectionByPid (pid) {
       return this.connections.find(a => a.pid === pid)
+    },
+
+    clearDebugOutput () {
+      this.debugOutput = ''
+    },
+
+    copyDebugOutput () {
+      clipboard.writeText(this.debugOutput)
+
+      this.notify('Debug output copied to clipboard')
     }
   },
 
@@ -280,17 +305,32 @@ export default {
 
     connections () {
       return this.$store.state.Data.connections
+    },
+
+    appSettings () {
+      return this.$store.state.Settings.settings
     }
   },
 
   data () {
     return {
       listMode: 'none',
-      runningInBackgroundNotificationShowed: false
+      runningInBackgroundNotificationShowed: false,
+      debugOutput: ''
     }
   },
 
   mounted () {
+    const originalConsoleLog = console.log.bind(console)
+
+    console.log = (...args) => {
+      this.debugOutput = this.debugOutput.trim() + '\n' + args.join(' ')
+
+      this.$refs.debugOutput.scrollTo(0, this.$refs.debugOutput.scrollHeight + 200)
+
+      originalConsoleLog(...args)
+    }
+
     ProcessManager.on('terminated', pid => {
       let conn = this.getConnectionByPid(pid)
 
@@ -341,22 +381,83 @@ export default {
   padding: 0;
   display: flex;
 
-  .list {
+  .left {
+    @debug-panel-height: 200px;
+
     flex: 1;
     height: calc(100vh - 32px);
     position: relative;
 
-    .no-data {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      color: fade(contrast(@main-color), 20%);
+    .connection-list {
+      height: calc(100% - @debug-panel-height);
+      overflow: auto;
+
+      .no-data {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: fade(contrast(@main-color), 20%);
+      }
+    }
+
+    .debug-panel {
+      position: relative;
+      height: @debug-panel-height;
+      border-top: 1px solid lighten(@main-color, 1%);
+
+      .title {
+        font-size: 10pt;
+        color: fade(contrast(@main-color), 30%);
+        padding: 10px;
+      }
+
+      .debug-actions {
+        position: absolute;
+        top: 7px;
+        right: 10px;
+
+        button {
+          margin-left: 3px;
+          width: 25px;
+          height: 25px;
+          border: none;
+          border-radius: 100%;
+          padding: 4px;
+          background: fade(contrast(@main-color), 5%);
+          cursor: pointer;
+          outline: none;
+
+          &:hover {
+            background: @primary-color;
+          }
+
+          &:active {
+            background: darken(@primary-color, 5%);
+          }
+
+          svg {
+            fill: contrast(@main-color);
+          }
+        }
+      }
+
+      textarea {
+        width: 100%;
+        height: calc(100% - 38px);
+        background: transparent;
+        border: none;
+        font-family: 'Consolas', 'Courier New', Courier, monospace;
+        padding: 10px;
+        color: #2FFF54;
+        outline: none;
+        resize: none;
+      }
     }
   }
 
-  .actions {
+  .right {
     position: relative;
     width: 200px;
     background: lighten(@main-color, 3%);

@@ -3,7 +3,8 @@ const state = {
     sshfsBinary: 'C:\\Program Files\\SSHFS-Win\\bin\\sshfs.exe',
     startupWithOS: true,
     displayTrayMessageOnClose: true,
-    processTrackTimeout: 15
+    processTrackTimeout: 15,
+    showDebugPanel: false
   }
 }
 
@@ -17,7 +18,8 @@ const mutations = {
       sshfsBinary: 'C:\\Program Files\\SSHFS-Win\\bin\\sshfs.exe',
       startupWithOS: true,
       displayTrayMessageOnClose: true,
-      processTrackTimeout: 15
+      processTrackTimeout: 15,
+      showDebugPanel: false
     }
   }
 }

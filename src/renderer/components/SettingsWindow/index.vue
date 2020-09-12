@@ -14,6 +14,7 @@
       <div class="form-item" style="margin: 10px 0">
         <SwitchLabel label="Startup with Windows" v-model="data.startupWithOS"/>
         <SwitchLabel label="Display system tray message on close" v-model="data.displayTrayMessageOnClose"/>
+        <SwitchLabel label="Show debug panel" v-model="data.showDebugPanel"/>
       </div>
 
       <div class="footer">
