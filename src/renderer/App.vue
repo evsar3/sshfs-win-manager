@@ -153,6 +153,21 @@ div.form-item {
     }
   }
 }
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+  border: none;
+}
+::-webkit-scrollbar-thumb {
+  background: lighten(@main-color, 10%);
+  border-radius: 0 !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: @primary-color;
+}
 </style>
 
 <style>
