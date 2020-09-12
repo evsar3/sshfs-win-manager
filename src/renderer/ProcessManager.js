@@ -24,18 +24,17 @@ class ProcessManager extends EventEmitter {
     }, (this.processHandler.settings.processTrackTimeout * 1000))
 
     return new Promise((resolve, reject) => {
-      this.processHandler.create(conn).then((pid, process) => {
+      this.processHandler.create(conn).then((process) => {
         this.emit('created', {
           conn,
-          process,
-          pid
+          process
         })
 
-        this.watch(pid)
+        this.watch(process.pid)
 
-        processList.push(pid)
+        processList.push(process.pid)
 
-        resolve(pid)
+        resolve(process.pid)
       }).catch(error => {
         reject(error)
       }).finally(() => {

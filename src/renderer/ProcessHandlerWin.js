@@ -1,5 +1,6 @@
 import { spawn, exec } from 'child_process'
-import fs from 'fs'
+import { dirname } from 'path'
+import { existsSync as fileExistsSync } from 'fs'
 
 class ProcessHandlerWin {
   constructor (settings) {
@@ -8,18 +9,23 @@ class ProcessHandlerWin {
 
   create (conn) {
     return new Promise((resolve, reject) => {
+      if (this.settings.sshfsBinary.endsWith('sshfs-win.exe')) {
+        this.settings.sshfsBinary = this.settings.sshfsBinary.replace(/sshfs-win\.exe$/, 'sshfs.exe')
+      }
+
       let cmdArgs = [
-        'cmd',
         `${conn.user}@${conn.host}:${conn.folder}`,
         conn.mountPoint,
         `-p${conn.port}`,
         `-ovolname=${conn.name.substr(0, 32)}`,
+        '-odebug',
+        '-ologlevel=debug1',
         '-oStrictHostKeyChecking=no',
         '-oUserKnownHostsFile=/dev/null'
       ]
 
-      if (!fs.existsSync(this.settings.sshfsBinary)) {
-        reject(new Error(`SSHFS-Win binary not found at "${this.settings.sshfsBinary}". Check your settings`)); return
+      if (!fileExistsSync(this.settings.sshfsBinary)) {
+        reject(new Error(`SSHFS binary not found at "${this.settings.sshfsBinary}". Check your settings`)); return
       }
 
       if (conn.advanced.customCmdlOptionsEnabled) {
@@ -67,28 +73,66 @@ class ProcessHandlerWin {
         cmdArgs.push(`-oIdentityFile="${conn.keyFile.replace(/\\/g, '/')}"`)
       }
 
-      const childProcess = spawn(this.settings.sshfsBinary, cmdArgs)
+      console.log('-----------------------------------------------------')
+      console.log('date:', new Date().toISOString())
+      console.log('conn:', conn.name, `({${conn.uuid}})`)
+      console.log('conntype:', conn.authType)
+      console.log('cmd:', `"${this.settings.sshfsBinary}" ${cmdArgs.join(' ')}`)
+
+      const childProcess = spawn(this.settings.sshfsBinary, cmdArgs, {
+        env: {
+          PATH: dirname(this.settings.sshfsBinary)
+        }
+      })
 
       if (conn.authType === 'password' || conn.authType === 'password-ask') {
         childProcess.stdin.write(conn.password + '\n')
       }
 
-      let intermmediatePid = 0
-
-      this.getChildProcessPid(childProcess.pid).then(pid => {
-        intermmediatePid = pid
+      childProcess.stdout.on('data', data => {
+        console.log('stdout:', data.toString())
       })
 
+      let debugOutput = ''
+      let lastDebugMessage = ''
+
       childProcess.stderr.on('data', data => {
-        reject(data.toString())
+        data = data.toString()
+
+        console.log('stderr:', data)
+
+        debugOutput += data
+        lastDebugMessage = data
+
+        if (data.includes('service sshfs has been started')) {
+          resolve(childProcess)
+        }
       })
 
       childProcess.on('close', exitCode => {
-        if (exitCode === 0) {
-          this.getChildProcessPid(intermmediatePid).then(pid => {
-            resolve(pid)
-          })
+        console.log('exit', 'code', exitCode, `(${conn.name} {${conn.uuid}})`)
+
+        if (debugOutput.includes('no such identity')) {
+          reject(new Error('Private key not found: ' + conn.keyFile))
         }
+
+        if (debugOutput.includes('mount point in use')) {
+          reject(new Error('Mount point in use'))
+        }
+
+        if (debugOutput.includes('Permission denied')) {
+          if (conn.authType === 'key-file') {
+            reject(new Error('Invalid user name'))
+          } else {
+            reject(new Error('Invalid user name or password'))
+          }
+        }
+
+        if (debugOutput.includes('Permission denied')) {
+          reject(new Error('Invalid user name or password'))
+        }
+
+        reject(new Error(lastDebugMessage))
       })
     })
   }
