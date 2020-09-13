@@ -75,7 +75,7 @@ class ProcessHandlerWin {
 
       console.log('-----------------------------------------------------')
       console.log('date:', new Date().toISOString())
-      console.log('conn:', conn.name, `({${conn.uuid}})`)
+      console.log('conn:', `{${conn.uuid}}`, `(${conn.name})`)
       console.log('conntype:', conn.authType)
       console.log('cmd:', `"${this.settings.sshfsBinary}" ${cmdArgs.join(' ')}`)
 
@@ -99,7 +99,7 @@ class ProcessHandlerWin {
       childProcess.stderr.on('data', data => {
         data = data.toString()
 
-        console.log('stderr:', data)
+        console.log(`{${conn.uuid}}`, data)
 
         debugOutput += data
         lastDebugMessage = data
@@ -110,7 +110,7 @@ class ProcessHandlerWin {
       })
 
       childProcess.on('close', exitCode => {
-        console.log('exit', 'code', exitCode, `(${conn.name} {${conn.uuid}})`)
+        console.log(`{${conn.uuid}}`, 'exit', exitCode)
 
         if (debugOutput.includes('no such identity')) {
           reject(new Error('Private key not found: ' + conn.keyFile))
