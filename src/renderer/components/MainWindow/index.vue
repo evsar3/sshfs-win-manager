@@ -2,7 +2,7 @@
   <Window title="SSHFS-Win Manager" closeAction="hide" @close="showRunningInBackgroundNotification">
     <div class="wrap">
       <div class="left">
-        <div class="connection-list">
+        <div class="connection-list" :class="{'has-debug-panel': appSettings.showDebugPanel}">
           <div v-if="!hasConnections" class="no-data">
             <h1>No servers added yet</h1>
             <p>Try clicking at 'Add Server' in the panel aside</p>
@@ -331,6 +331,11 @@ export default {
       originalConsoleLog(...args)
     }
 
+    this.connections.forEach(conn => {
+      conn.status = 'disconnected'
+      conn.pid = null
+    })
+
     ProcessManager.on('terminated', pid => {
       let conn = this.getConnectionByPid(pid)
 
@@ -389,8 +394,12 @@ export default {
     position: relative;
 
     .connection-list {
-      height: calc(100% - @debug-panel-height);
+      height: 100%;
       overflow: auto;
+
+      &.has-debug-panel {
+        height: calc(100% - @debug-panel-height);
+      }
 
       .no-data {
         position: absolute;
