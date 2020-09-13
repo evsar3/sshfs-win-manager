@@ -97,9 +97,11 @@ class ProcessHandlerWin {
       let lastDebugMessage = ''
 
       childProcess.stderr.on('data', data => {
-        data = data.toString()
+        data = data.toString().trim()
 
-        console.log(`{${conn.uuid}}`, data)
+        if (!data.match(/^\[\d{5}\]/)) {
+          console.log(`{${conn.uuid}}`, data)
+        }
 
         debugOutput += data
         lastDebugMessage = data
