@@ -105,6 +105,9 @@ export default {
     },
 
     save () {
+      this.conn.advanced.customCmdlOptions =
+        this.conn.advanced.customCmdlOptions.filter(a => a.name !== '')
+
       if (this.isEditingMode) {
         this.$store.dispatch('UPDATE_CONNECTION', this.conn)
       } else {
