@@ -3,6 +3,10 @@ const state = {
 }
 
 const mutations = {
+  REFRESH_CONNECTIONS (state, payload) {
+    state.connections = payload
+  },
+
   ADD_CONNECTION (state, payload) {
     state.connections.push(payload)
   },
@@ -46,6 +50,10 @@ const mutations = {
 }
 
 const actions = {
+  REFRESH_CONNECTIONS ({ commit }, payload) {
+    commit('REFRESH_CONNECTIONS', payload)
+  },
+
   ADD_CONNECTION ({ commit }, payload) {
     commit('ADD_CONNECTION', payload)
   },
