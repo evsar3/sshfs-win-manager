@@ -324,9 +324,17 @@ export default {
     const originalConsoleLog = console.log.bind(console)
 
     console.log = (...args) => {
-      this.debugOutput = this.debugOutput.trim() + '\n' + args.join(' ')
+      if (this.appSettings.showDebugPanel) {
+        const data = args.join(' ').trim()
 
-      this.$refs.debugOutput.scrollTo(0, this.$refs.debugOutput.scrollHeight + 200)
+        if (!data.match(/\[?\d{5}\]?/gm)) {
+          this.debugOutput += '\n' + data
+
+          this.$nextTick().then(() => {
+            this.$refs.debugOutput.scrollTop = this.$refs.debugOutput.scrollHeight
+          })
+        }
+      }
 
       originalConsoleLog(...args)
     }

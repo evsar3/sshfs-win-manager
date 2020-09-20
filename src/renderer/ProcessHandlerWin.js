@@ -73,46 +73,45 @@ class ProcessHandlerWin {
         cmdArgs.push(`-oIdentityFile="${conn.keyFile.replace(/\\/g, '/')}"`)
       }
 
-      console.log('-----------------------------------------------------')
+      console.log('-'.repeat(80))
       console.log('date:', new Date().toISOString())
       console.log('conn:', `{${conn.uuid}}`, `(${conn.name})`)
       console.log('conntype:', conn.authType)
       console.log('cmd:', `"${this.settings.sshfsBinary}" ${cmdArgs.join(' ')}`)
 
-      const childProcess = spawn(this.settings.sshfsBinary, cmdArgs, {
+      const process = spawn(this.settings.sshfsBinary, cmdArgs, {
         env: {
           PATH: dirname(this.settings.sshfsBinary)
         }
       })
 
       if (conn.authType === 'password' || conn.authType === 'password-ask') {
-        childProcess.stdin.write(conn.password + '\n')
+        process.stdin.write(conn.password + '\n')
       }
 
-      childProcess.stdout.on('data', data => {
-        console.log('stdout:', data.toString())
+      process.stdout.on('data', data => {
+        console.log(`{${conn.uuid}} stdout:`, data.toString())
       })
 
       let debugOutput = ''
       let lastDebugMessage = ''
 
-      childProcess.stderr.on('data', data => {
+      process.stderr.on('data', data => {
         data = data.toString().trim()
 
-        if (!data.match(/^\[\d{5}\]/)) {
-          console.log(`{${conn.uuid}}`, data)
-        }
+        console.log(`{${conn.uuid}} stderr:`, data)
 
         debugOutput += data
+        debugOutput = debugOutput.substr(-512)
         lastDebugMessage = data
 
         if (data.includes('service sshfs has been started')) {
-          resolve(childProcess)
+          resolve(process)
         }
       })
 
-      childProcess.on('close', exitCode => {
-        console.log(`{${conn.uuid}}`, 'exit', exitCode)
+      process.on('close', exitCode => {
+        console.log(`{${conn.uuid}}`, 'exit:', exitCode)
 
         if (debugOutput.includes('no such identity')) {
           reject(new Error('Private key not found: ' + conn.keyFile))
