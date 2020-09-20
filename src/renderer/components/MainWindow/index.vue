@@ -8,7 +8,9 @@
             <p>Try clicking at 'Add Server' in the panel aside</p>
           </div>
 
-          <ConnectionItem v-for="conn in connections" :key="conn.uuid" :conn="conn" :mode="listMode" @connect="connect" @disconnect="disconnect" @open="openLocal" @edit="editConnection" @delete="deleteConnection" @clone="cloneConnection"/>
+          <draggable :list="connections" @end="updateConnectionList" chosenClass="highlight-item" dragClass="hide-dragging-item" handle=".grip" animation="200">
+            <ConnectionItem v-for="conn in connections" :key="conn.uuid" :conn="conn" :mode="listMode" @connect="connect" @disconnect="disconnect" @open="openLocal" @edit="editConnection" @delete="deleteConnection" @clone="cloneConnection"/>
+          </draggable>
         </div>
 
         <div v-show="appSettings.showDebugPanel" class="debug-panel">
@@ -67,6 +69,8 @@ import { remote, clipboard } from 'electron'
 
 import { v4 as uuid } from 'uuid'
 
+import draggable from 'vuedraggable'
+
 import ProcessManager from '@/ProcessManager'
 
 import Window from '@/components/Window'
@@ -79,6 +83,8 @@ export default {
   name: 'main-window',
 
   components: {
+    draggable,
+
     Window,
     Icon,
 
@@ -281,6 +287,10 @@ export default {
       clipboard.writeText(this.debugOutput)
 
       this.notify('Debug output copied to clipboard')
+    },
+
+    updateConnectionList () {
+      this.$store.dispatch('REFRESH_CONNECTIONS', this.connections)
     }
   },
 
@@ -495,5 +505,12 @@ export default {
       margin-bottom: 5px;
     }
   }
+}
+
+.hide-dragging-item {
+  opacity: 0;
+}
+.highlight-item {
+  border: 1px dotted fade(contrast(@main-color), 50%);
 }
 </style>

@@ -1,5 +1,11 @@
 <template>
   <div class="item">
+    <transition name="reveal-to-right">
+      <div v-show="isEditing" class="grip">
+        <Icon icon="grip"/>
+      </div>
+    </transition>
+
     <div class="icon">
       <Icon icon="cloudDrive"/>
     </div>
@@ -38,11 +44,11 @@
         <Icon icon="trashCan"/>
       </button>
 
-      <button v-tooltip="'Duplicate connection'" v-show="showEditButton" @click="$emit('clone', conn)">
+      <button v-tooltip="'Duplicate connection'" v-show="isEditing" @click="$emit('clone', conn)">
         <Icon icon="duplicate"/>
       </button>
 
-      <button v-show="showEditButton" class="success" @click="$emit('edit', conn)">
+      <button v-show="isEditing" class="success" @click="$emit('edit', conn)">
         <Icon icon="pen"/>
       </button>
     </div>
@@ -85,7 +91,7 @@ export default {
       return this.mode === 'none' || this.isConnected || this.isConnectingOrDisconnecting
     },
 
-    showEditButton () {
+    isEditing () {
       return this.mode === 'edit' && !this.isConnected && !this.isConnectingOrDisconnecting
     },
 
@@ -112,6 +118,19 @@ export default {
 
   > div {
     flex: 1;
+    overflow: hidden;
+  }
+
+  .grip {
+    flex: 0 0 40px;
+    text-align: center;
+    margin: auto 0;
+    cursor: ns-resize;
+
+    svg {
+      fill: fade(contrast(@main-color), 10%);
+      width: 20px;
+    }
   }
 
   .icon {
@@ -170,6 +189,7 @@ export default {
     margin-right: 15px;
     flex: 0 0;
     white-space: nowrap;
+    overflow: visible;
 
     button {
       width: @list-control-button-size;
@@ -234,5 +254,13 @@ export default {
       }
     }
   }
+}
+
+.reveal-to-right-enter-active, .reveal-to-right-leave-active {
+  transition: all .5s;
+}
+.reveal-to-right-enter, .reveal-to-right-leave-to {
+  opacity: 0;
+  flex: 0 !important;
 }
 </style>
