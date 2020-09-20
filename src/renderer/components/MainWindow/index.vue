@@ -69,7 +69,6 @@ import { v4 as uuid } from 'uuid'
 
 import ProcessManager from '@/ProcessManager'
 
-import { PerfectScrollbar } from 'vue2-perfect-scrollbar'
 import Window from '@/components/Window'
 import Icon from '@/components/Icon'
 import ConnectionItem from './ConnectionItem'
@@ -80,7 +79,6 @@ export default {
   name: 'main-window',
 
   components: {
-    PerfectScrollbar,
     Window,
     Icon,
 
@@ -499,5 +497,3 @@ export default {
   }
 }
 </style>
-
-<style src="vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css"/>
