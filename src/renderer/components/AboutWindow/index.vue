@@ -9,6 +9,11 @@
         <p class="repo-url">
           <a href="https://github.com/evsar3/sshfs-win-manager">https://github.com/evsar3/sshfs-win-manager</a>
         </p>
+        <p class="donate-btn">
+          <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HXZUJ8WX47238">
+            <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" title="PayPal - The safer, easier way to pay online!">
+          </a>
+        </p>
         <p>
           Version: {{appVersion}}<br>
           Author: Evandro Araujo (<a href="https://github.com/evsar3">@evsar3</a>)
@@ -24,9 +29,6 @@
           </ul>
         </p>
         <p>Icons kindly provided by <a href="https://icons8.com">Icons8.com</a></p>
-        <p>
-          Thanks to <a href="https://twitter.com/elviinunes">@elviinunes</a> for UX tips
-        </p>
       </div>
     </div>
   </Window>
@@ -93,6 +95,12 @@ export default {
       font-size: 10pt;
       color: fade(contrast(@main-color), 80%);
       margin: 10px 0;
+
+      &.donate-btn {
+        position: fixed;
+        top: 40px;
+        right: 20px;
+      }
 
       &.repo-url {
         margin-bottom: 20px;

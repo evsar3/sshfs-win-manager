@@ -236,7 +236,7 @@ export default {
 
     about () {
       const window = windowManager.createNew('about-window', '', '/index.html#about', null, {
-        height: 380,
+        height: 350,
         width: 550,
         useContentSize: true,
         frame: false,
