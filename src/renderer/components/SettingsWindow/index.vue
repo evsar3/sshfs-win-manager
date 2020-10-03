@@ -2,7 +2,7 @@
   <Window title="Settings">
     <div class="wrap">
       <div class="form-item">
-        <label>SSHFS-Win Binary</label>
+        <label>SSHFS Binary</label>
         <input type="text" autofocus placeholder="eg. C:\Program Files\SSHFS-Win\bin\sshfs-win.exe" v-model="data.sshfsBinary">
       </div>
 
