@@ -511,6 +511,6 @@ export default {
   opacity: 0;
 }
 .highlight-item {
-  border: 1px dotted fade(contrast(@main-color), 50%);
+  border: 1px solid @primary-color;
 }
 </style>

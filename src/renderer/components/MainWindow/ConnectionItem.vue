@@ -1,7 +1,7 @@
 <template>
   <div class="item">
     <transition name="reveal-to-right">
-      <div v-show="isEditing" class="grip">
+      <div v-show="showMoveGrip" class="grip">
         <Icon icon="grip"/>
       </div>
     </transition>
@@ -93,6 +93,10 @@ export default {
 
     isEditing () {
       return this.mode === 'edit' && !this.isConnected && !this.isConnectingOrDisconnecting
+    },
+
+    showMoveGrip () {
+      return this.mode === 'edit'
     },
 
     showDeleteButton () {
