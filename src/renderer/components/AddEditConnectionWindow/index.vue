@@ -65,6 +65,9 @@
             
             <CustomCmdlOptions v-model="conn.advanced.customCmdlOptions"/>
           </div>
+        <div class="form-item">
+          <SwitchLabel label="Connect on Startup" v-model="conn.advanced.connectOnStartup"/>
+        </div>
         </Tab>
       </Tabs>
 
@@ -146,7 +149,8 @@ export default {
         pid: 0,
         advanced: {
           customCmdlOptionsEnabled: false,
-          customCmdlOptions: []
+          customCmdlOptions: [],
+          connectOnStartup: false
         }
       }
     }
