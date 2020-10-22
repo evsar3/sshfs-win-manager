@@ -61,17 +61,14 @@
         </Tab>
         <Tab label="ADVANCED">
           <div class="form-item">
-            <div class="form-item">
-              <SwitchLabel label="Connect on Startup" v-model="conn.advanced.connectOnStartup"/>
-            </div>
+            <SwitchLabel label="Connect on Startup" v-model="conn.advanced.connectOnStartup"/>
           </div>
-          
+
           <div class="form-item">
             <SwitchLabel label="Custom Command Line params" v-model="conn.advanced.customCmdlOptionsEnabled"/>
-            
+
             <CustomCmdlOptions v-model="conn.advanced.customCmdlOptions"/>
           </div>
-      
         </Tab>
       </Tabs>
 

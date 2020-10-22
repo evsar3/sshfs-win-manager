@@ -350,7 +350,7 @@ export default {
     this.connections.forEach(conn => {
       conn.status = 'disconnected'
       conn.pid = null
-      
+
       if (conn.advanced.connectOnStartup) {
         this.connect(conn)
       }
