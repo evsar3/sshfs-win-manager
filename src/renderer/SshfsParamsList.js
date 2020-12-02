@@ -268,5 +268,15 @@ export default [
     name: 'to_code',
     type: 'string',
     description: 'New encoding of the file names (default: ISO-8859-2)'
+  },
+  {
+    name: 'create_file_umask',
+    type: 'number',
+    description: 'New file permissions (octal)'
+  },
+  {
+    name: 'create_dir_umask',
+    type: 'number',
+    description: 'New directory permissions (octal)'
   }
 ]
