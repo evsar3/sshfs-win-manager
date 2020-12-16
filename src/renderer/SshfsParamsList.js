@@ -268,5 +268,20 @@ export default [
     name: 'to_code',
     type: 'string',
     description: 'New encoding of the file names (default: ISO-8859-2)'
+  },
+  {
+    name: 'create_umask',
+    type: 'string',
+    description: '(No description)'
+  },
+  {
+    name: 'noatime',
+    type: 'bool',
+    description: '(No description)'
+  },
+  {
+    name: 'nomtime',
+    type: 'bool',
+    description: '(No description)'
   }
 ]
