@@ -270,18 +270,13 @@ export default [
     description: 'New encoding of the file names (default: ISO-8859-2)'
   },
   {
-    name: 'create_umask',
-    type: 'string',
-    description: '(No description)'
+    name: 'create_file_umask',
+    type: 'number',
+    description: 'New file permissions (octal)'
   },
   {
-    name: 'noatime',
-    type: 'bool',
-    description: '(No description)'
-  },
-  {
-    name: 'nomtime',
-    type: 'bool',
-    description: '(No description)'
+    name: 'create_dir_umask',
+    type: 'number',
+    description: 'New directory permissions (octal)'
   }
 ]
