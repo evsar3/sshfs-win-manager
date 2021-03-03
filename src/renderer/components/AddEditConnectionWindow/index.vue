@@ -36,9 +36,14 @@
             <label>Password</label>
             <input type="password" v-model="conn.password">
           </div>
-          <div v-show="conn.authType === 'key-file'" class="form-item">
-            <label>Key File</label>
-            <input type="text" placeholder="eg. C:\Users\me\.ssh\id_rsa" v-model="conn.keyFile">
+          <div v-show="conn.authType === 'key-file'" class="form-row">
+            <div class="form-item">
+              <label>Key File</label>
+              <input type="text" placeholder="eg. C:\Users\me\.ssh\id_rsa" v-model="conn.keyFile">
+            </div>
+            <div class="form-item" style="flex: 0 0 80px">
+              <button class="btn" style="margin-top: 23px" @click="selectPrivateKey">Browse</button>
+            </div>
           </div>
           <div v-show="conn.authType === 'key-input'" class="form-item">
             <label>Key</label>
@@ -124,6 +129,18 @@ export default {
     authTypeChange () {
       this.conn.password = ''
       this.conn.keyFile = process.env.USERPROFILE + '\\.ssh\\id_rsa'
+    },
+
+    selectPrivateKey () {
+      const file = remote.dialog.showOpenDialog({
+        title: 'Select private key',
+        properties: ['openFile'],
+        defaultPath: process.env.USERPROFILE + '\\.ssh\\'
+      })
+
+      if (file) {
+        this.conn.keyFile = file
+      }
     }
   },
 
