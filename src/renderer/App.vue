@@ -94,6 +94,14 @@ button.btn {
     float: left;
     margin-right: 5px;
   }
+
+  &.icon-btn {
+    min-width: initial;
+
+    svg {
+      margin: 0;
+    }
+  }
 }
 
 h1.section-title {

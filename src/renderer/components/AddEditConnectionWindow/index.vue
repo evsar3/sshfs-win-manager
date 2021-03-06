@@ -41,8 +41,10 @@
               <label>Key File</label>
               <input type="text" placeholder="eg. C:\Users\me\.ssh\id_rsa" v-model="conn.keyFile">
             </div>
-            <div class="form-item" style="flex: 0 0 80px">
-              <button class="btn" style="margin-top: 23px" @click="selectPrivateKey">Browse</button>
+            <div class="form-item" style="flex: 0">
+              <button class="btn icon-btn" style="margin-top: 23px" @click="selectPrivateKey" v-tooltip="'Select private key'">
+                <Icon icon="openFolder"/>
+              </button>
             </div>
           </div>
           <div v-show="conn.authType === 'key-input'" class="form-item">
@@ -94,6 +96,7 @@ import Tabs from '@/components/Tabs/Tabs'
 import Tab from '@/components/Tabs/Tab'
 import SwitchLabel from '@/components/SwitchLabel'
 import CustomCmdlOptions from './CustomCmdlOptions'
+import Icon from '../Icon'
 
 const windowManager = remote.require('electron-window-manager')
 
@@ -105,7 +108,8 @@ export default {
     Tabs,
     Tab,
     SwitchLabel,
-    CustomCmdlOptions
+    CustomCmdlOptions,
+    Icon
   },
 
   methods: {
