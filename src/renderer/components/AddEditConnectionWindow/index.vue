@@ -66,7 +66,7 @@
             </select>
           </div>
         </Tab>
-        <Tab label="ADVANCED">
+        <Tab label="ADVANCED" class="advanced-tab">
           <div class="form-item">
             <SwitchLabel label="Connect on Startup" v-model="conn.advanced.connectOnStartup"/>
           </div>
@@ -191,12 +191,21 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.wrap .footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 15px;
-  text-align: right;
+.wrap  {
+  .advanced-tab {
+    overflow: auto;
+    height: 610px;
+    width: 100%;
+    padding-right: 5px;
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    text-align: right;
+  }
 }
 </style>
