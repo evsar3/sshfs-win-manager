@@ -1,4 +1,5 @@
-import { spawn, exec } from 'child_process'
+import { exec, spawn } from 'child_process'
+
 import { dirname } from 'path'
 import { existsSync as fileExistsSync } from 'fs'
 
@@ -61,6 +62,10 @@ class ProcessHandlerWin {
             '-ofollow_symlinks'
           ]
         ]
+      }
+
+      if (conn.advanced.reconnect && (!conn.advanced.customCmdlOptionsEnabled && !conn.advanced.customCmdlOptions.includes('-oreconnect'))) {
+        cmdArgs.push('-oreconnect')
       }
 
       if (conn.authType === 'password' || conn.authType === 'password-ask') {

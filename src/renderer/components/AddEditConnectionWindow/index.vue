@@ -69,6 +69,7 @@
         <Tab label="ADVANCED" class="advanced-tab">
           <div class="form-item">
             <SwitchLabel label="Connect on Startup" v-model="conn.advanced.connectOnStartup"/>
+            <SwitchLabel label="Try to Reconnect on Connection Loss" v-model="conn.advanced.reconnect"/>
           </div>
 
           <div class="form-item">
@@ -172,7 +173,8 @@ export default {
         advanced: {
           customCmdlOptionsEnabled: false,
           customCmdlOptions: [],
-          connectOnStartup: false
+          connectOnStartup: false,
+          reconnect: false
         }
       }
     }

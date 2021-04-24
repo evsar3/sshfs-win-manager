@@ -42,7 +42,9 @@ const mutations = {
       if (!conn.advanced) {
         conn.advanced = {
           customCmdlOptionsEnabled: false,
-          customCmdlOptions: []
+          customCmdlOptions: [],
+          connectOnStartup: false,
+          reconnect: false
         }
       }
     })
