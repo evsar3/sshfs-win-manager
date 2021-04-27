@@ -107,8 +107,12 @@ export default {
         ProcessManager.create(c).then(pid => {
           conn.pid = pid
           conn.status = 'connected'
+
+          this.updateConnectionList()
         }).catch(error => {
           conn.status = 'disconnected'
+
+          this.updateConnectionList()
 
           this.notify(`Can't connect to '${conn.name}': ${error}`, 'error-icon')
         })
@@ -152,6 +156,8 @@ export default {
 
       ProcessManager.terminate(conn.pid).then(() => {
         conn.status = 'disconnected'
+
+        this.updateConnectionList()
       })
     },
 
