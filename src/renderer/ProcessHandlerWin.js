@@ -17,7 +17,9 @@ class ProcessHandlerWin {
       let mountPoint = conn.mountPoint
 
       if (mountPoint === 'auto') {
-        mountPoint = await this.getFirstAvailableDriveLetter()
+        mountPoint = await this.getFirstAvailableDriveLetter(conn.preferredMountPoint)
+
+        conn.preferredMountPoint = mountPoint
       }
 
       let cmdArgs = [
@@ -223,7 +225,7 @@ class ProcessHandlerWin {
     })
   }
 
-  getFirstAvailableDriveLetter () {
+  getFirstAvailableDriveLetter (preferredMountPoint = null) {
     return new Promise((resolve, reject) => {
       exec(`wmic logicaldisk get name`, (err, stdout) => {
         const driveLetters = 'DEFGHIJKLMNOPQRSTUVWXYZ'.split('')
@@ -233,7 +235,11 @@ class ProcessHandlerWin {
             .map(i => i.substr(0, 1).toUpperCase())
           const availableDriveLetters = driveLetters.filter(i => !drivers.includes(i))
 
-          resolve(availableDriveLetters[0] + ':')
+          if (preferredMountPoint && availableDriveLetters.includes(preferredMountPoint.substr(0, 1))) {
+            resolve(preferredMountPoint)
+          } else {
+            resolve(availableDriveLetters[0] + ':')
+          }
         } else {
           reject(new Error('Process not found'))
         }
