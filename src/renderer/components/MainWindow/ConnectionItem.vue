@@ -15,7 +15,7 @@
 
       <div class="details">
         <span class="local-path">
-          {{conn.mountPoint}}
+          {{mountPointLabel}}
         </span>
 
         <span class="sep">•</span>
@@ -26,7 +26,7 @@
     </div>
 
     <div class="controls">
-      <button v-show="isConnected" @click="$emit('open', conn.mountPoint)">
+      <button v-show="isConnected" @click="$emit('open', conn.mountPoint === 'auto' ? conn.preferredMountPoint : conn.mountPoint)">
         <Icon icon="openFolder"/>
       </button>
 
@@ -101,6 +101,16 @@ export default {
 
     showDeleteButton () {
       return this.mode === 'delete' && !this.isConnected && !this.isConnectingOrDisconnecting
+    },
+
+    mountPointLabel () {
+      if (this.isConnected && this.conn.mountPoint === 'auto') {
+        return `Auto (${this.conn.preferredMountPoint})`
+      } else if (this.conn.mountPoint === 'auto') {
+        return 'Auto'
+      } else {
+        return this.conn.mountPoint
+      }
     }
   }
 }
