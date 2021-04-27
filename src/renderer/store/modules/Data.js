@@ -37,15 +37,29 @@ const mutations = {
     state.connections = []
   },
 
-  MIGRATE_CONNECTIONS_ADVANCED_OPTIONS (state) {
+  MIGRATE_CONNECTIONS (state) {
     state.connections.forEach(conn => {
+      // v1.0.2-beta.1
       if (!conn.advanced) {
         conn.advanced = {
           customCmdlOptionsEnabled: false,
-          customCmdlOptions: [],
-          connectOnStartup: false,
-          reconnect: false
+          customCmdlOptions: []
         }
+      }
+
+      // v1.2.1
+      if (!conn.advanced.connectOnStartup) {
+        conn.advanced.connectOnStartup = false
+      }
+
+      // v1.2.1
+      if (!conn.advanced.reconnect) {
+        conn.advanced.reconnect = false
+      }
+
+      // v1.2.1
+      if (!conn.preferredMountPoint) {
+        conn.preferredMountPoint = null
       }
     })
   }
@@ -76,8 +90,8 @@ const actions = {
     commit('CLEAR_CONNECTIONS')
   },
 
-  APPLY_CONNECTIONS_MIGRATIONS ({ commit }) {
-    commit('MIGRATE_CONNECTIONS_ADVANCED_OPTIONS')
+  APPLY_MIGRATIONS ({ commit }) {
+    commit('MIGRATE_CONNECTIONS')
   }
 }
 

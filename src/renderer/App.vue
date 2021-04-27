@@ -13,7 +13,7 @@ export default {
   name: 'sshfs-win-manager',
 
   mounted () {
-    this.$store.dispatch('APPLY_CONNECTIONS_MIGRATIONS')
+    this.$store.dispatch('APPLY_MIGRATIONS')
 
     ipcRenderer.on('terminate-child-processes', () => {
       ProcessManager.terminateAll().then(() => {
