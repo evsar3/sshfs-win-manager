@@ -9,14 +9,22 @@ class ProcessHandlerWin {
   }
 
   create (conn) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (this.settings.sshfsBinary.endsWith('sshfs-win.exe')) {
         this.settings.sshfsBinary = this.settings.sshfsBinary.replace(/sshfs-win\.exe$/, 'sshfs.exe')
       }
 
+      let mountPoint = conn.mountPoint
+
+      if (mountPoint === 'auto') {
+        mountPoint = await this.getFirstAvailableDriveLetter(conn.preferredMountPoint)
+
+        conn.preferredMountPoint = mountPoint
+      }
+
       let cmdArgs = [
         `${conn.user}@${conn.host}:${conn.folder}`,
-        conn.mountPoint,
+        mountPoint,
         `-p${conn.port}`,
         `-ovolname=${conn.name.substr(0, 32)}`,
         '-odebug',
@@ -210,6 +218,28 @@ class ProcessHandlerWin {
           })
 
           resolve({ pid, creationDate })
+        } else {
+          reject(new Error('Process not found'))
+        }
+      })
+    })
+  }
+
+  getFirstAvailableDriveLetter (preferredMountPoint = null) {
+    return new Promise((resolve, reject) => {
+      exec(`wmic logicaldisk get name`, (err, stdout) => {
+        const driveLetters = 'DEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+
+        if (!err) {
+          const drivers = stdout.toString().trim().split('\n').slice(1)
+            .map(i => i.substr(0, 1).toUpperCase())
+          const availableDriveLetters = driveLetters.filter(i => !drivers.includes(i))
+
+          if (preferredMountPoint && availableDriveLetters.includes(preferredMountPoint.substr(0, 1))) {
+            resolve(preferredMountPoint)
+          } else {
+            resolve(availableDriveLetters[0] + ':')
+          }
         } else {
           reject(new Error('Process not found'))
         }
