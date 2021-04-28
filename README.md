@@ -10,13 +10,13 @@
 # SSHFS-Win Manager
 
 ## Introduction 
-SSHFS-Win Manager is a GUI (graphics user interface) for SSHFS on Windows (comming soon for other platforms).
+SSHFS-Win Manager is a GUI (graphics user interface) for SSHFS on Windows (coming soon to other platforms).
 
 ## Installation
 **Step 1**  
 
 Install SSHFS-Win on your Windows computer.  
-Follow they [installation instructions](https://github.com/billziss-gh/sshfs-win/blob/master/README.md) before continue.  
+Follow the [installation instructions](https://github.com/billziss-gh/sshfs-win/blob/master/README.md) before continuing.  
 
 **Step 2**  
 
@@ -59,17 +59,17 @@ Add your connections and enjoy!
 *Close to system tray*
 
 ## Bugs & help
-If you have any question or a bug report please open a [new issue](https://github.com/evsar3/sshfs-win-manager/issues/new)
+If you have any questions or a bug report please open a [new issue](https://github.com/evsar3/sshfs-win-manager/issues/new)
 
 ## Contributing
-If you want to contribute with this project, please see the [contributing guide-lines](https://github.com/evsar3/sshfs-win-manager/blob/master/CONTRIBUTING.md)  
-If you just want to build or compile this project see instructions [here](https://github.com/evsar3/sshfs-win-manager/blob/master/CONTRIBUTING.md#building-and-compiling)
+If you want to contribute to this project, please see the [contribution guidelines](https://github.com/evsar3/sshfs-win-manager/blob/master/CONTRIBUTING.md)
+If you just want to build or compile this project see the instructions [here](https://github.com/evsar3/sshfs-win-manager/blob/master/CONTRIBUTING.md#building-and-compiling)
 
 ## Donation
-If you like this project, please consider [making a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HXZUJ8WX47238). 100% of the founds will be revert for <u>charity</u>.
+If you like this project, please consider [making a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HXZUJ8WX47238). 100% of the funds will be reserved for <u>charity</u>.
 
 ## Notes
-<sup>1</sup> This software stores your password in a plain json file. If there is any concerns on storing your password that way, please use one of the other authentication methods. See issue #28
+<sup>1</sup> This software stores your password in a plain json file. If there are any concerns about storing your password that way, please use one of the other authentication methods. [See issue #28](https://github.com/evsar3/sshfs-win-manager/issues/28)
 
 ## License
 MIT License
