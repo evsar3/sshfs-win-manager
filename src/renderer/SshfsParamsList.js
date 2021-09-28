@@ -278,5 +278,10 @@ export default [
     name: 'create_dir_umask',
     type: 'number',
     description: 'New directory permissions (octal)'
+  },
+  {
+    name: 'Ciphers',
+    type: 'string',
+    description: 'Specify the cipher to encrypt the connection'
   }
 ]
