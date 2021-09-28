@@ -144,8 +144,8 @@ export default {
         defaultPath: process.env.USERPROFILE + '\\.ssh\\'
       })
 
-      if (file) {
-        this.conn.keyFile = file
+      if (file && file.length > 0) {
+        this.conn.keyFile = file[0]
       }
     }
   },
