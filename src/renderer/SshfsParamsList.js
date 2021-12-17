@@ -283,5 +283,10 @@ export default [
     name: 'Ciphers',
     type: 'string',
     description: 'Specify the cipher to encrypt the connection'
+  },
+  {
+    name: 'StrictHostKeyChecking',
+    type: 'string',
+    description: 'If this flag is set to "yes", ssh will never automatically add host keys to the ~/.ssh/known_hosts'
   }
 ]
