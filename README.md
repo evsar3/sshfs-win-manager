@@ -46,16 +46,16 @@ Add your connections and enjoy!
 - Connection debug log
 
 ## Screenshots
-![Main Window](https://lw1.net.babum.dev/static/sshfs-win-manager/main-window-screenshot.png)  
+![Main Window](https://user-images.githubusercontent.com/1992754/179056109-a0df5872-f187-40b1-895c-9ef57abd5fe7.png)  
 *Main Window*
 
-![Add Connection](https://lw1.net.babum.dev/static/sshfs-win-manager/add-connection-screenshot.png)  
+![Add Connection](https://user-images.githubusercontent.com/1992754/179056126-0f767346-fe93-48fc-9ceb-3514b0b7b386.png)  
 *Add & edit connections*
 
-![Open mounted drive](https://lw1.net.babum.dev/static/sshfs-win-manager/explorer-screenshot.png)  
+![Open mounted drive](https://user-images.githubusercontent.com/1992754/179056142-3d368a65-f9c6-4232-86d6-bb8db6eff556.png)  
 *Explore mounted drive*
 
-![System tray](https://lw1.net.babum.dev/static/sshfs-win-manager/systray-screenshot.png)  
+![System tray](https://user-images.githubusercontent.com/1992754/179056152-9a7088c4-f23a-4c0d-b70b-1ccf879897fb.png)  
 *Close to system tray*
 
 ## Bugs & help
