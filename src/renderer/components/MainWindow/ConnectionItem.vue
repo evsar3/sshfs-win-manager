@@ -30,13 +30,17 @@
         <Icon icon="openFolder"/>
       </button>
 
+      <button v-show="isConnectingOrDisconnecting"  @click="$emit('abort', conn.pid)">
+        <Icon icon="cancel"/>
+      </button>
+
       <button v-show="showConnectButton" :class="{ 'success': isConnected, 'connecting-disconnecting': isConnectingOrDisconnecting }" :disabled="isConnectingOrDisconnecting" @click="$emit(isConnected ? 'disconnect' : 'connect', conn)">
         <svg v-show="isConnectingOrDisconnecting" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
           <circle cx="50" cy="50" fill="none" stroke-width="10" r="35" stroke-dasharray="164.93361431346415 56.97787143782138" transform="rotate(108.558 50 50)">
             <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 50 50;360 50 50" keyTimes="0;1"></animateTransform>
           </circle>
         </svg>
-        
+
         <Icon v-show="!isConnectingOrDisconnecting" :icon="isConnected ? 'plugConnected' : 'plugDisconnected'"/>
       </button>
 

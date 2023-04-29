@@ -9,7 +9,9 @@
           </div>
 
           <draggable :list="connections" @end="updateConnectionList" chosenClass="highlight-item" dragClass="hide-dragging-item" handle=".grip" animation="200">
-            <ConnectionItem v-for="conn in connections" :key="conn.uuid" :conn="conn" :mode="listMode" @connect="connect" @disconnect="disconnect" @open="openLocal" @edit="editConnection" @delete="deleteConnection" @clone="cloneConnection"/>
+            <ConnectionItem v-for="conn in connections" :key="conn.uuid" :conn="conn" :mode="listMode" 
+              @connect="connect" @disconnect="disconnect" @open="openLocal" @edit="editConnection" 
+              @delete="deleteConnection" @clone="cloneConnection" @abort="abortConnection"/>
           </draggable>
         </div>
 
@@ -92,6 +94,11 @@ export default {
   },
 
   methods: {
+    abortConnection (pid) {
+      ProcessManager.terminate(pid)
+      this.updateConnectionList()
+    },
+
     toggleDeleteMode () {
       this.listMode = this.listMode === 'delete' ? 'none' : 'delete'
     },
