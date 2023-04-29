@@ -30,7 +30,7 @@
         <Icon icon="openFolder"/>
       </button>
 
-      <button v-show="isConnectingOrDisconnecting"  @click="$emit('abort', conn.pid)">
+      <button v-show="isConnectingOrDisconnecting"  @click="$emit('abort', conn)">
         <Icon icon="cancel"/>
       </button>
 
