@@ -22,6 +22,12 @@ Follow they [installation instructions](https://github.com/billziss-gh/sshfs-win
 
 Once SSHFS-Win is installed, [**download the lastest setup**](https://github.com/evsar3/sshfs-win-manager/releases/latest) from the [releases](https://github.com/evsar3/sshfs-win-manager/releases) section and install it.  
 
+Can also be easily installed with [WinGet](https://github.com/microsoft/winget-cli):
+
+```console
+winget install evsar3.sshfs-win-manager
+```
+
 **Step 3**  
 
 Add your connections and enjoy!
