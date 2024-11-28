@@ -1,0 +1,11 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.addMissingImports": "always",
+    "source.organizeImports": "always",
+    "source.fixAll": "always"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.rulers": [100, 120],
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
