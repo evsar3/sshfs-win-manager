@@ -3,6 +3,7 @@
     "dbaeumer.vscode-eslint",
     "editorconfig.editorconfig",
     "github.vscode-pull-request-github",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "vue.volar"
   ]
 }

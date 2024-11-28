@@ -7,6 +7,7 @@ export interface Connection {
   host: string
   driveLetter: string
   remotePath: string
+  status: 'connected' | 'connecting' | 'disconnected'
 }
 
 export const useConnectionStore = defineStore('connections', () => {
@@ -16,21 +17,24 @@ export const useConnectionStore = defineStore('connections', () => {
       name: 'Lorem Ipsum',
       driveLetter: 'X:',
       host: 'foo.example.com',
-      remotePath: '/home/user'
+      remotePath: '/home/user',
+      status: 'disconnected'
     },
     {
       id: '0427abb9-6442-4e87-8ce2-a4794532ad3c',
       name: 'Dolot Sit Amet',
       driveLetter: 'Y:',
       host: 'bar.example.com',
-      remotePath: '/home/user'
+      remotePath: '/home/user',
+      status: 'disconnected'
     },
     {
       id: 'de6fa09a-98b8-49b9-8dbc-56ddcbc7630c',
       name: 'Consectetur Adipisicing',
       driveLetter: 'Z:',
       host: 'baz.example.com',
-      remotePath: '/home/user'
+      remotePath: '/home/user',
+      status: 'disconnected'
     }
   ])
 

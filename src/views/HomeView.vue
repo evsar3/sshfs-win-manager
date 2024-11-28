@@ -1,11 +1,23 @@
 <script lang="ts" setup>
 import ConnectionItem from '../components/ConnectionItem.vue'
 import GroupItem from '../components/GroupItem.vue'
-import { useConnectionStore } from '../store/connections'
+import { Connection, useConnectionStore } from '../store/connections'
 import { useGroupStore } from '../store/groups'
 
 const connectionStore = useConnectionStore()
 const groupStore = useGroupStore()
+
+function connect(connection: Connection) {
+  connection.status = 'connecting'
+
+  setTimeout(() => {
+    connection.status = 'connected'
+  }, 3000)
+}
+
+function disconnect(connection: Connection) {
+  connection.status = 'disconnected'
+}
 </script>
 
 <template>
@@ -41,6 +53,8 @@ const groupStore = useGroupStore()
             v-for="connection in connectionStore.connections"
             :key="connection.id"
             :connection="connection"
+            @connect="connect"
+            @disconnect="disconnect"
           />
         </div>
       </section>
@@ -67,6 +81,11 @@ main {
   > aside,
   > article {
     padding: @handle-bar-height 20px 20px 20px;
+  }
+
+  > aside {
+    flex: 0 0 35%;
+    background-color: var(--theme-contrast-color-opacity-05);
 
     > h1 {
       font-size: 14pt;
@@ -80,11 +99,6 @@ main {
         height: 24px !important;
       }
     }
-  }
-
-  > aside {
-    flex: 0 0 35%;
-    background-color: var(--theme-contrast-color-opacity-05);
   }
 
   > article {
