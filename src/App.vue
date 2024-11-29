@@ -17,8 +17,11 @@
   --theme-contrast-color-opacity-5: rgba(0, 0, 0, 0.5);
 
   --theme-success-color: #2dc937;
+  --theme-success-contrast-color: #fff;
   --theme-warning-color: #e7b416;
+  --theme-warning-contrast-color: #fff;
   --theme-danger-color: #cc3232;
+  --theme-danger-contrast-color: #fff;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -1,10 +1,15 @@
 <script lang="ts" setup>
+import { v4 as uuid } from 'uuid'
 import { Connection, useConnectionStore } from '../store/connections'
+import { useGroupStore } from '../store/groups'
 
 const connectionStore = useConnectionStore()
+const groupStore = useGroupStore()
 
 const props = defineProps<{
   connection: Connection
+  groupId: string
+  draggable: boolean
 }>()
 
 defineEmits<{
@@ -12,6 +17,24 @@ defineEmits<{
   disconnect: (connection: Connection) => void
   edit: (connection: Connection) => void
 }>()
+
+function clone() {
+  connectionStore.connections.push({
+    ...props.connection,
+    id: uuid(),
+    name: props.connection.name + ' (Copy)'
+  })
+}
+
+function removeFromGroup() {
+  if (props.groupId === 'all') {
+    return
+  }
+
+  const group = groupStore.groups.find((group) => group.id === props.groupId)!
+
+  group.connections.splice(group.connections.indexOf(props.connection.id), 1)
+}
 
 function remove() {
   if (confirm('Do you really want to remove this connection?')) {
@@ -22,6 +45,9 @@ function remove() {
 
 <template>
   <div class="connection-item" :class="connection.status">
+    <div v-if="draggable" class="handle">
+      <v-icon name="la-equals-solid" />
+    </div>
     <div>
       <div class="title">{{ connection.name }}</div>
       <div class="info">
@@ -37,20 +63,29 @@ function remove() {
         <v-icon name="co-check-alt" />
       </div>
 
-      <button v-if="connection.status === 'disconnected'" @click="$emit('connect', connection)">
-        <v-icon name="co-check-alt" />
-      </button>
+      <template v-if="!draggable">
+        <button v-if="connection.status === 'disconnected'" @click="$emit('connect', connection)">
+          <v-icon name="co-check-alt" />
+        </button>
 
-      <button v-if="connection.status !== 'disconnected'" @click="$emit('disconnect', connection)">
-        <v-icon name="co-x" />
-      </button>
+        <button
+          v-if="connection.status !== 'disconnected'"
+          @click="$emit('disconnect', connection)"
+        >
+          <v-icon name="co-x" />
+        </button>
 
-      <button v-if="connection.status === 'disconnected'" class="options">
-        <v-icon name="bi-three-dots-vertical" />
-      </button>
+        <button v-if="connection.status === 'disconnected'" class="options">
+          <v-icon name="bi-three-dots-vertical" />
+        </button>
+      </template>
 
       <div class="options-menu">
         <div @mousedown="$emit('edit', connection)"><v-icon name="co-pencil" /> Edit</div>
+        <div @mousedown="clone"><v-icon name="co-clone" /> Clone</div>
+        <div v-if="groupId !== 'all'" @mousedown="removeFromGroup" class="danger">
+          <v-icon name="co-x" /> Remove from group
+        </div>
         <div @mousedown="remove" class="danger"><v-icon name="co-trash" /> Remove</div>
       </div>
     </div>
@@ -93,6 +128,14 @@ function remove() {
       padding: 2px 10px;
       border-radius: 50px;
     }
+  }
+
+  .handle {
+    flex: 0 0 40px;
+    display: flex;
+    align-items: center;
+    cursor: move;
+    color: var(--theme-contrast-color-opacity-4);
   }
 
   .controls {
@@ -139,7 +182,7 @@ function remove() {
       height: 24px;
       border-radius: 50%;
       background-color: var(--theme-success-color);
-      color: #fff;
+      color: var(--theme-success-contrast-color);
       align-items: center;
       justify-content: center;
     }
