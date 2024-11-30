@@ -62,14 +62,14 @@ function groupDrop(event: DragEvent): void {
   <div class="handle"></div>
   <main>
     <aside>
-      <h1>
+      <h1 class="title">
         Groups
         <button class="control-btn" :disabled="draggableMode">
           <v-icon name="co-plus" scale=".8" />
         </button>
       </h1>
 
-      <section>
+      <section class="group-list">
         <VueDraggableNext v-model="groupStore.groups" handle=".handle">
           <GroupItem
             v-for="group in groupStore.groups"
@@ -92,37 +92,38 @@ function groupDrop(event: DragEvent): void {
       </section>
     </aside>
     <article>
-      <section>
-        <div class="controls">
-          <button
-            class="control-btn"
-            :class="{ active: draggableMode }"
-            @click="draggableMode = !draggableMode"
-          >
-            <v-icon name="co-swap-vertical" />
-          </button>
-          <button class="control-btn" :disabled="draggableMode">
-            <v-icon name="co-plus" />
-          </button>
-        </div>
-        <div class="connection-list">
-          <VueDraggableNext
-            v-model="connectionStore.connections"
-            handle=".handle"
-            @choose="connectionDragStart"
-            @unchoose="connectionDragEnd"
-          >
-            <ConnectionItem
-              v-for="connection in connections"
-              :key="connection.id"
-              :connection="connection"
-              :group-id="groupStore.activeGroupId"
-              :draggable="draggableMode"
-              @connect="connect"
-              @disconnect="disconnect"
-            />
-          </VueDraggableNext>
-        </div>
+      <section class="controls">
+        <button
+          class="control-btn"
+          :class="{ active: draggableMode }"
+          @click="draggableMode = !draggableMode"
+        >
+          <v-icon name="co-swap-vertical" />
+        </button>
+        <button class="control-btn">
+          <v-icon name="co-cog" />
+        </button>
+        <button class="control-btn" :disabled="draggableMode">
+          <v-icon name="co-plus" />
+        </button>
+      </section>
+      <section class="connection-list">
+        <VueDraggableNext
+          v-model="connectionStore.connections"
+          handle=".handle"
+          @choose="connectionDragStart"
+          @unchoose="connectionDragEnd"
+        >
+          <ConnectionItem
+            v-for="connection in connections"
+            :key="connection.id"
+            :connection="connection"
+            :group-id="groupStore.activeGroupId"
+            :draggable="draggableMode"
+            @connect="connect"
+            @disconnect="disconnect"
+          />
+        </VueDraggableNext>
       </section>
     </article>
   </main>
@@ -146,16 +147,17 @@ main {
 
   > aside,
   > article {
-    padding: @handle-bar-height 20px 20px 20px;
+    display: flex;
+    flex-direction: column;
   }
 
   > aside {
     flex: 0 0 35%;
     background-color: var(--theme-contrast-color-opacity-05);
 
-    > h1 {
+    > .title {
       font-size: 14pt;
-      margin: 20px 0;
+      margin: (@handle-bar-height + 20px) 20px 0 20px;
       opacity: 0.7;
       font-weight: bold;
 
@@ -165,14 +167,28 @@ main {
         height: 24px !important;
       }
     }
+
+    > .group-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
   }
 
   > article {
     flex: 1;
+    display: flex;
+    flex-direction: column;
 
-    .controls {
+    > .controls {
       text-align: right;
-      margin-bottom: 10px;
+      margin: @handle-bar-height 20px 10px 20px;
+    }
+
+    > .connection-list {
+      flex: 1;
+      padding: 0 20px 20px 20px;
+      overflow-y: auto;
     }
   }
 }

@@ -10,6 +10,7 @@ import {
   CoApps,
   CoCheckAlt,
   CoClone,
+  CoCog,
   CoPencil,
   CoPlus,
   CoSwapVertical,
@@ -28,7 +29,8 @@ addIcons(
   CoClone,
   CoSwapVertical,
   CoApps,
-  LaEqualsSolid
+  LaEqualsSolid,
+  CoCog
 )
 
 const app = createApp(App)
