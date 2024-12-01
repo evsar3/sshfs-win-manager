@@ -3,24 +3,32 @@ import { computed, ref } from 'vue'
 import { VueDraggableNext } from 'vue-draggable-next'
 
 import ConnectionItem from '../components/ConnectionItem.vue'
+import DialogModal from '../components/DialogModal.vue'
 import GroupItem from '../components/GroupItem.vue'
 
 import { Connection, useConnectionStore } from '../store/connections'
 import { Group, useGroupStore } from '../store/groups'
+import { useMainStore } from '../store/main'
 
+const mainStore = useMainStore()
 const connectionStore = useConnectionStore()
 const groupStore = useGroupStore()
 
-const draggableMode = ref(false)
 const draggingConnection = ref<Connection | null>(null)
 const dropoverGroup = ref<Group | null>(null)
 
-const connections = computed(() => {
-  const group = groupStore.groups.find((group) => group.id === groupStore.activeGroupId)!
+const showGroupEditor = ref(false)
+const groupEditorData = ref<Partial<Group>>({})
+const isEditingGroup = ref(false)
 
-  return connectionStore.connections.filter((connection) => {
-    return groupStore.activeGroupId === 'all' || group.connections.includes(connection.id)
-  })
+const showGroupDeletionConfirmation = ref(false)
+const deleteGroupId = ref('')
+
+const showConnectionDeletionConfirmation = ref(false)
+const deleteConnectionId = ref('')
+
+const connections = computed<Connection[]>(() => {
+  return mainStore.getActiveGroup().connections.map((id) => connectionStore.getConnection(id))
 })
 
 function connect(connection: Connection): void {
@@ -35,36 +43,90 @@ function disconnect(connection: Connection): void {
   connection.status = 'disconnected'
 }
 
-function connectionDragStart(event: CustomEvent): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  draggingConnection.value = (event as any).item.__vnode.ctx.props.connection
-}
-
-function connectionDragEnd(): void {
-  draggingConnection.value = null
-}
-
-function groupDragOver(group: Group | null): void {
-  dropoverGroup.value = group
-}
-
 function groupDrop(event: DragEvent): void {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const group: Group = (event as any).target.__vnode.ctx.props.group
 
   dropoverGroup.value = null
 
-  group.connections.push(draggingConnection.value!.id)
+  if (group.id === 'all') {
+    groupStore.removeConnectionFromGroup(mainStore.activeGroupId, draggingConnection.value!.id)
+    return
+  }
+
+  groupStore.addConnectionToGroup(group.id, draggingConnection.value!.id)
+}
+
+function openGroupEditor(group?: Group): void {
+  if (group) {
+    groupEditorData.value = { ...group }
+    isEditingGroup.value = true
+  } else {
+    groupEditorData.value = {}
+    isEditingGroup.value = false
+  }
+
+  showGroupEditor.value = true
+}
+
+function resetGroupEditorData(): void {
+  groupEditorData.value = {}
+
+  showGroupEditor.value = false
+}
+
+function saveGroup(): void {
+  if (isEditingGroup.value) {
+    groupStore.updateGroup(groupEditorData.value as Group)
+  } else {
+    groupStore.addGroup(groupEditorData.value as Group)
+  }
+
+  resetGroupEditorData()
+}
+
+function openDeleteGroupModal(group: Group): void {
+  deleteGroupId.value = group.id
+  showGroupDeletionConfirmation.value = true
+}
+
+function deleteGroup(): void {
+  mainStore.activeGroupId = 'all'
+  groupStore.removeGroup(deleteGroupId.value)
+  showGroupDeletionConfirmation.value = false
+}
+
+function openDeleteConnectionModal(connection: Connection): void {
+  deleteConnectionId.value = connection.id
+  showConnectionDeletionConfirmation.value = true
+}
+
+function deleteConnection(): void {
+  connectionStore.removeConnection(deleteConnectionId.value)
+  showConnectionDeletionConfirmation.value = false
+}
+
+function cloneConnection(connection: Connection): void {
+  const conn = connectionStore.addConnection({
+    ...connection,
+    name: `${connection.name} (Copy)`
+  })
+
+  if (mainStore.activeGroupId !== 'all') {
+    groupStore.addConnectionToGroup(mainStore.activeGroupId, conn.id)
+  }
 }
 </script>
 
 <template>
-  <div class="handle"></div>
+  <nav class="handle"></nav>
+
   <main>
     <aside>
       <h1 class="title">
         Groups
-        <button class="control-btn" :disabled="draggableMode">
+
+        <button class="btn btn-icon" :disabled="mainStore.dragMode" @click="openGroupEditor()">
           <v-icon name="co-plus" scale=".8" />
         </button>
       </h1>
@@ -75,58 +137,101 @@ function groupDrop(event: DragEvent): void {
             v-for="group in groupStore.groups"
             :key="group.id"
             :group="group"
-            :active="group.id === groupStore.activeGroupId"
-            :draggable="draggableMode"
             :style="{
               backgroundColor:
                 group.id === dropoverGroup?.id && draggingConnection !== null
                   ? 'var(--theme-contrast-color-opacity-3)'
                   : undefined
             }"
-            @click="groupStore.activeGroupId = group.id"
-            @dragover="groupDragOver(group)"
-            @dragleave="groupDragOver(null)"
+            @click="mainStore.activeGroupId = group.id"
+            @dragover="dropoverGroup = group"
+            @dragleave="dropoverGroup = null"
             @drop="groupDrop"
+            @edit="openGroupEditor"
+            @delete="openDeleteGroupModal"
           />
         </VueDraggableNext>
       </section>
     </aside>
+
     <article>
-      <section class="controls">
+      <nav class="controls">
         <button
-          class="control-btn"
-          :class="{ active: draggableMode }"
-          @click="draggableMode = !draggableMode"
+          class="btn btn-icon"
+          :class="{ active: mainStore.dragMode }"
+          @click="mainStore.dragMode = !mainStore.dragMode"
         >
           <v-icon name="co-swap-vertical" />
         </button>
-        <button class="control-btn">
+        <button class="btn btn-icon">
           <v-icon name="co-cog" />
         </button>
-        <button class="control-btn" :disabled="draggableMode">
+        <button class="btn btn-icon btn-primary" :disabled="mainStore.dragMode">
           <v-icon name="co-plus" />
         </button>
-      </section>
+      </nav>
+
       <section class="connection-list">
         <VueDraggableNext
-          v-model="connectionStore.connections"
+          v-model="mainStore.getActiveGroup().connections"
           handle=".handle"
-          @choose="connectionDragStart"
-          @unchoose="connectionDragEnd"
+          @choose="draggingConnection = $event.item.__vnode.ctx.props.connection"
+          @unchoose="draggingConnection = null"
         >
           <ConnectionItem
             v-for="connection in connections"
             :key="connection.id"
             :connection="connection"
-            :group-id="groupStore.activeGroupId"
-            :draggable="draggableMode"
+            :group-id="mainStore.activeGroupId"
+            :draggable="mainStore.dragMode"
             @connect="connect"
             @disconnect="disconnect"
+            @delete="openDeleteConnectionModal"
+            @clone="cloneConnection"
           />
         </VueDraggableNext>
       </section>
     </article>
   </main>
+
+  <DialogModal :title="(isEditingGroup ? 'Edit' : 'New') + ' Group'" v-model:show="showGroupEditor">
+    <input
+      v-model="groupEditorData.name"
+      class="input-field"
+      style="width: 300px"
+      placeholder="Group Name"
+    />
+
+    <template #actions>
+      <button class="btn" @click="resetGroupEditorData">Cancel</button>
+      <button class="btn btn-primary" @click="saveGroup">
+        {{ isEditingGroup ? 'Save' : 'Create' }}
+      </button>
+    </template>
+  </DialogModal>
+
+  <DialogModal title="Delete Group" v-model:show="showGroupDeletionConfirmation">
+    <p>Are you sure you want to delete this group?</p>
+    <p>Deleting this group wont delete connections linked to it.</p>
+
+    <template #actions>
+      <button class="btn" @click="showGroupDeletionConfirmation = false">Cancel</button>
+      <button class="btn btn-danger" @click="deleteGroup">Delete</button>
+    </template>
+  </DialogModal>
+
+  <DialogModal title="Delete Connection" v-model:show="showConnectionDeletionConfirmation">
+    <p>Are you sure you want to delete this connection?</p>
+    <p v-if="mainStore.activeGroupId !== 'all'">
+      If you want to remove this connection from this specific group,<br />
+      you can do so by dragging it to the "All" group.
+    </p>
+
+    <template #actions>
+      <button class="btn" @click="showConnectionDeletionConfirmation = false">Cancel</button>
+      <button class="btn btn-danger" @click="deleteConnection">Delete</button>
+    </template>
+  </DialogModal>
 </template>
 
 <style lang="less" scoped>
@@ -193,28 +298,13 @@ main {
   }
 }
 
-.control-btn {
-  border-radius: 50px;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  border: 2px solid var(--theme-contrast-color-opacity-1);
-  color: var(--theme-constrast-color);
+.input-field {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--theme-contrast-color-opacity-1);
+  border-radius: 10px;
   background-color: var(--theme-contrast-color-opacity-05);
-  margin-left: 8px;
-
-  &:hover {
-    background-color: var(--theme-contrast-color-opacity-1);
-  }
-
-  &:active,
-  &.active {
-    background-color: var(--theme-contrast-color-opacity-2);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
+  color: var(--theme-contrast-color);
+  outline: none;
 }
 </style>

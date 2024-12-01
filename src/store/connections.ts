@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
+import { v4 as uuid } from 'uuid'
 import { reactive } from 'vue'
+import { useGroupStore } from './groups'
 
 export interface Connection {
   id: string
@@ -11,6 +13,8 @@ export interface Connection {
 }
 
 export const useConnectionStore = defineStore('connections', () => {
+  const groupStore = useGroupStore()
+
   const connections = reactive<Connection[]>([
     {
       id: '71c56ad1-19b0-4512-839b-a8827385d6d2',
@@ -38,7 +42,40 @@ export const useConnectionStore = defineStore('connections', () => {
     }
   ])
 
+  function getConnection(connectionId: string): Connection {
+    return connections.find((connection) => connection.id === connectionId)!
+  }
+
+  function addConnection(connection: Omit<Connection, 'id'>): Connection {
+    const conn: Connection = {
+      ...connection,
+      id: uuid()
+    }
+
+    connections.push(conn)
+
+    groupStore.addConnectionToGroup('all', conn.id)
+
+    return conn
+  }
+
+  function updateConnection(connection: Partial<Connection>): void {
+    const index = connections.findIndex((c) => c.id === connection.id)
+
+    Object.assign(connections[index], connection)
+  }
+
+  function removeConnection(connectionId: string): void {
+    const index = connections.findIndex((connection) => connection.id === connectionId)!
+
+    connections.splice(index, 1)
+  }
+
   return {
-    connections
+    connections,
+    getConnection,
+    addConnection,
+    updateConnection,
+    removeConnection
   }
 })
