@@ -9,10 +9,12 @@ import GroupItem from '../components/GroupItem.vue'
 import { Connection, useConnectionStore } from '../store/connections'
 import { Group, useGroupStore } from '../store/groups'
 import { useMainStore } from '../store/main'
+import { useSettingsStore } from '../store/settings'
 
 const mainStore = useMainStore()
 const connectionStore = useConnectionStore()
 const groupStore = useGroupStore()
+const settingsStore = useSettingsStore()
 
 const draggingConnection = ref<Connection | null>(null)
 const dropoverGroup = ref<Group | null>(null)
@@ -21,6 +23,8 @@ const showGroupEditor = ref(false)
 const groupEditorData = ref<Partial<Group>>({})
 const isEditingGroup = ref(false)
 
+const showSettings = ref(false)
+
 const showGroupDeletionConfirmation = ref(false)
 const deleteGroupId = ref('')
 
@@ -28,7 +32,7 @@ const showConnectionDeletionConfirmation = ref(false)
 const deleteConnectionId = ref('')
 
 const connections = computed<Connection[]>(() => {
-  return mainStore.getActiveGroup().connections.map((id) => connectionStore.getConnection(id))
+  return mainStore.getActiveGroup().connections.map((id) => connectionStore.get(id))
 })
 
 function connect(connection: Connection): void {
@@ -50,11 +54,11 @@ function groupDrop(event: DragEvent): void {
   dropoverGroup.value = null
 
   if (group.id === 'all') {
-    groupStore.removeConnectionFromGroup(mainStore.activeGroupId, draggingConnection.value!.id)
+    groupStore.removeConnection(mainStore.activeGroupId, draggingConnection.value!.id)
     return
   }
 
-  groupStore.addConnectionToGroup(group.id, draggingConnection.value!.id)
+  groupStore.addConnection(group.id, draggingConnection.value!.id)
 }
 
 function openGroupEditor(group?: Group): void {
@@ -77,43 +81,43 @@ function resetGroupEditorData(): void {
 
 function saveGroup(): void {
   if (isEditingGroup.value) {
-    groupStore.updateGroup(groupEditorData.value as Group)
+    groupStore.update(groupEditorData.value as Group)
   } else {
-    groupStore.addGroup(groupEditorData.value as Group)
+    groupStore.add(groupEditorData.value as Group)
   }
 
   resetGroupEditorData()
 }
 
-function openDeleteGroupModal(group: Group): void {
+function openGroupDeletionConfirmation(group: Group): void {
   deleteGroupId.value = group.id
   showGroupDeletionConfirmation.value = true
 }
 
 function deleteGroup(): void {
   mainStore.activeGroupId = 'all'
-  groupStore.removeGroup(deleteGroupId.value)
+  groupStore.remove(deleteGroupId.value)
   showGroupDeletionConfirmation.value = false
 }
 
-function openDeleteConnectionModal(connection: Connection): void {
+function openConnectionDeletionConfirmation(connection: Connection): void {
   deleteConnectionId.value = connection.id
   showConnectionDeletionConfirmation.value = true
 }
 
 function deleteConnection(): void {
-  connectionStore.removeConnection(deleteConnectionId.value)
+  connectionStore.remove(deleteConnectionId.value)
   showConnectionDeletionConfirmation.value = false
 }
 
 function cloneConnection(connection: Connection): void {
-  const conn = connectionStore.addConnection({
+  const conn = connectionStore.add({
     ...connection,
     name: `${connection.name} (Copy)`
   })
 
   if (mainStore.activeGroupId !== 'all') {
-    groupStore.addConnectionToGroup(mainStore.activeGroupId, conn.id)
+    groupStore.addConnection(mainStore.activeGroupId, conn.id)
   }
 }
 </script>
@@ -148,7 +152,7 @@ function cloneConnection(connection: Connection): void {
             @dragleave="dropoverGroup = null"
             @drop="groupDrop"
             @edit="openGroupEditor"
-            @delete="openDeleteGroupModal"
+            @delete="openGroupDeletionConfirmation"
           />
         </VueDraggableNext>
       </section>
@@ -163,7 +167,7 @@ function cloneConnection(connection: Connection): void {
         >
           <v-icon name="co-swap-vertical" />
         </button>
-        <button class="btn btn-icon">
+        <button @click="showSettings = true" class="btn btn-icon">
           <v-icon name="co-cog" />
         </button>
         <button class="btn btn-icon btn-primary" :disabled="mainStore.dragMode">
@@ -186,7 +190,7 @@ function cloneConnection(connection: Connection): void {
             :draggable="mainStore.dragMode"
             @connect="connect"
             @disconnect="disconnect"
-            @delete="openDeleteConnectionModal"
+            @delete="openConnectionDeletionConfirmation"
             @clone="cloneConnection"
           />
         </VueDraggableNext>
@@ -210,9 +214,26 @@ function cloneConnection(connection: Connection): void {
     </template>
   </DialogModal>
 
+  <DialogModal title="Settings" v-model:show="showSettings">
+    <p>
+      <label>
+        Theme:
+        <select v-model="settingsStore.settings.theme" class="input-field">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="auto">System</option>
+        </select>
+      </label>
+    </p>
+
+    <template #actions>
+      <button @click="showSettings = false" class="btn btn-primary">Close</button>
+    </template>
+  </DialogModal>
+
   <DialogModal title="Delete Group" v-model:show="showGroupDeletionConfirmation">
     <p>Are you sure you want to delete this group?</p>
-    <p>Deleting this group wont delete connections linked to it.</p>
+    <p>Deleting this group won't delete connections linked to it.</p>
 
     <template #actions>
       <button class="btn" @click="showGroupDeletionConfirmation = false">Cancel</button>
@@ -275,8 +296,8 @@ main {
 
     > .group-list {
       flex: 1;
-      overflow-y: auto;
       padding: 20px;
+      overflow: hidden auto;
     }
   }
 
@@ -293,7 +314,7 @@ main {
     > .connection-list {
       flex: 1;
       padding: 0 20px 20px 20px;
-      overflow-y: auto;
+      overflow: hidden auto;
     }
   }
 }

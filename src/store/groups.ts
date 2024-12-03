@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid'
 import { reactive } from 'vue'
 
 export interface Group {
-  id: string
+  id: 'all' | (string & {})
   name: string
   /**
    * List of connection IDs
@@ -24,11 +24,15 @@ export const useGroupStore = defineStore('groups', () => {
     }
   ])
 
-  function getGroup(groupId: string): Group {
+  function all(): Group[] {
+    return groups
+  }
+
+  function get(groupId: string): Group {
     return groups.find((group) => group.id === groupId)!
   }
 
-  function addGroup(group: Omit<Group, 'id' | 'connections'>): Group | null {
+  function add(group: Omit<Group, 'id' | 'connections'>): Group | null {
     if (group.name === '') return null
     if (group.name === 'All') return null
 
@@ -43,7 +47,7 @@ export const useGroupStore = defineStore('groups', () => {
     return gro
   }
 
-  function updateGroup(group: Partial<Group>): void {
+  function update(group: Partial<Group>): void {
     if (group.id === 'all') return
 
     const index = groups.findIndex((g) => g.id === group.id)
@@ -51,7 +55,7 @@ export const useGroupStore = defineStore('groups', () => {
     Object.assign(groups[index], group)
   }
 
-  function removeGroup(groupId: string): void {
+  function remove(groupId: string): void {
     if (groupId === 'all') return
 
     const index = groups.findIndex((group) => group.id === groupId)
@@ -59,7 +63,7 @@ export const useGroupStore = defineStore('groups', () => {
     groups.splice(index, 1)
   }
 
-  function addConnectionToGroup(groupId: string, connectionId: string): void {
+  function addConnection(groupId: string, connectionId: string): void {
     const group = groups.find((group) => group.id === groupId)!
 
     if (group.connections.includes(connectionId)) return
@@ -67,7 +71,7 @@ export const useGroupStore = defineStore('groups', () => {
     group.connections.push(connectionId)
   }
 
-  function removeConnectionFromGroup(groupId: string, connectionId: string): void {
+  function removeConnection(groupId: string, connectionId: string): void {
     if (groupId === 'all') return
 
     const group = groups.find((group) => group.id === groupId)!
@@ -76,13 +80,23 @@ export const useGroupStore = defineStore('groups', () => {
     group.connections.splice(index, 1)
   }
 
+  function removeConnectionFromAll(connectionId: string): void {
+    groups.forEach((group) => {
+      const index = group.connections.findIndex((id) => id === connectionId)
+
+      group.connections.splice(index, 1)
+    })
+  }
+
   return {
     groups,
-    getGroup,
-    addGroup,
-    updateGroup,
-    removeGroup,
-    addConnectionToGroup,
-    removeConnectionFromGroup
+    all,
+    get,
+    add,
+    update,
+    remove,
+    addConnection,
+    removeConnection,
+    removeConnectionFromAll
   }
 })
