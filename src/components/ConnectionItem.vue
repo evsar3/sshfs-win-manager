@@ -26,7 +26,7 @@ defineEmits<{
     <div>
       <div class="title">{{ connection.name }}</div>
       <div class="info">
-        <span>{{ connection.driveLetter }}</span>
+        <span>{{ connection.automaticMountPoint ? 'Auto' : connection.mountPoint }}</span>
         <span>{{ connection.host }}</span>
         <span>{{ connection.remotePath }}</span>
       </div>
@@ -41,7 +41,7 @@ defineEmits<{
       <template v-if="!mainStore.dragMode">
         <button
           v-if="connection.status === 'disconnected'"
-          class="btn btn-icon btn-success"
+          class="btn btn-icon btn-success btn-space-left"
           @click="$emit('connect', connection)"
         >
           <v-icon name="co-check-alt" />
@@ -49,13 +49,16 @@ defineEmits<{
 
         <button
           v-if="connection.status !== 'disconnected'"
-          class="btn btn-icon btn-danger"
+          class="btn btn-icon btn-danger btn-space-left"
           @click="$emit('disconnect', connection)"
         >
           <v-icon name="co-x" />
         </button>
 
-        <button v-if="connection.status === 'disconnected'" class="btn btn-icon options">
+        <button
+          v-if="connection.status === 'disconnected'"
+          class="btn btn-icon btn-space-left options"
+        >
           <v-icon name="bi-three-dots-vertical" />
         </button>
       </template>
@@ -158,7 +161,7 @@ defineEmits<{
       position: absolute;
       top: calc(50% + 18px);
       right: 0;
-      background-color: color-mix(in srgb, var(--theme-color) 95%, var(--theme-contrast-color));
+      background-color: color-mix(in oklab, var(--theme-color) 95%, var(--theme-contrast-color));
       border-radius: 15px;
       padding: 5px 0;
       box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
@@ -187,7 +190,7 @@ defineEmits<{
   }
 
   &.connected {
-    background-color: color-mix(in srgb, var(--theme-success-color) 20%, transparent);
+    background-color: color-mix(in oklab, var(--theme-success-color) 20%, transparent);
   }
 }
 

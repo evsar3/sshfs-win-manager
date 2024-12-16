@@ -83,7 +83,7 @@ defineEmits<{
       position: absolute;
       top: calc(50% + 18px);
       right: 0;
-      background-color: color-mix(in srgb, var(--theme-color) 95%, var(--theme-contrast-color));
+      background-color: color-mix(in oklab, var(--theme-color) 95%, var(--theme-contrast-color));
       border-radius: 15px;
       padding: 5px 0;
       box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);

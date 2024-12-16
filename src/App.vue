@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { watch } from 'vue'
+
 import { useSettingsStore } from './store/settings'
 
 const settingsStore = useSettingsStore()
@@ -21,60 +22,60 @@ watch(
 <style lang="less">
 .theme-light {
   --theme-color: hsl(0, 0%, 96%);
-  --theme-contrast-color: #444;
+  --theme-contrast-color: hsl(0, 0%, 27%);
 }
 
 .theme-dark {
   --theme-color: hsl(0, 0%, 12%);
-  --theme-contrast-color: #eee;
+  --theme-contrast-color: hsl(0, 0%, 93%);
 }
 
 :root {
   .theme-light();
 
   --theme-contrast-color-opacity-05: color-mix(
-    in srgb,
+    in oklab,
     var(--theme-contrast-color) 5%,
     transparent
   );
 
   --theme-contrast-color-opacity-1: color-mix(
-    in srgb,
+    in oklab,
     var(--theme-contrast-color) 10%,
     transparent
   );
 
   --theme-contrast-color-opacity-2: color-mix(
-    in srgb,
+    in oklab,
     var(--theme-contrast-color) 20%,
     transparent
   );
 
   --theme-contrast-color-opacity-3: color-mix(
-    in srgb,
+    in oklab,
     var(--theme-contrast-color) 30%,
     transparent
   );
 
   --theme-contrast-color-opacity-4: color-mix(
-    in srgb,
+    in oklab,
     var(--theme-contrast-color) 40%,
     transparent
   );
 
   --theme-contrast-color-opacity-5: color-mix(
-    in srgb,
+    in oklab,
     var(--theme-contrast-color) 50%,
     transparent
   );
 
-  --theme-primary-color: #007bff;
+  --theme-primary-color: hsl(211, 100%, 50%);
   --theme-primary-contrast-color: var(--theme-color);
-  --theme-success-color: #2dc937;
+  --theme-success-color: hsl(124, 63%, 48%);
   --theme-success-contrast-color: var(--theme-color);
-  --theme-warning-color: #e7b416;
+  --theme-warning-color: hsl(45, 83%, 50%);
   --theme-warning-contrast-color: var(--theme-color);
-  --theme-danger-color: #cc3232;
+  --theme-danger-color: hsl(0, 61%, 50%);
   --theme-danger-contrast-color: var(--theme-color);
 }
 
@@ -136,18 +137,21 @@ body {
   }
 }
 
-p:not(:last-child) {
-  margin-bottom: 10px;
-}
-
 .btn {
   border-radius: 10px;
   padding: 10px 20px;
-  margin-left: 10px;
   cursor: pointer;
   border: none;
   color: var(--theme-contrast-color);
   background-color: var(--theme-contrast-color-opacity-05);
+
+  &.btn-space-right {
+    margin-right: 10px;
+  }
+
+  &.btn-space-left {
+    margin-left: 10px;
+  }
 
   &.btn-primary {
     background-color: var(--theme-primary-color);
@@ -155,14 +159,14 @@ p:not(:last-child) {
 
     &:hover {
       background-color: color-mix(
-        in srgb,
+        in oklab,
         var(--theme-primary-color) 80%,
         var(--theme-primary-contrast-color)
       );
     }
 
     &:active {
-      background-color: color-mix(in srgb, var(--theme-primary-color) 60%, transparent);
+      background-color: color-mix(in oklab, var(--theme-primary-color) 60%, transparent);
     }
   }
 
@@ -172,14 +176,14 @@ p:not(:last-child) {
 
     &:hover {
       background-color: color-mix(
-        in srgb,
+        in oklab,
         var(--theme-success-color) 80%,
         var(--theme-success-contrast-color)
       );
     }
 
     &:active {
-      background-color: color-mix(in srgb, var(--theme-success-color) 60%, transparent);
+      background-color: color-mix(in oklab, var(--theme-success-color) 60%, transparent);
     }
   }
 
@@ -189,14 +193,14 @@ p:not(:last-child) {
 
     &:hover {
       background-color: color-mix(
-        in srgb,
+        in oklab,
         var(--theme-warning-color) 80%,
         var(--theme-warning-contrast-color)
       );
     }
 
     &:active {
-      background-color: color-mix(in srgb, var(--theme-warning-color) 60%, transparent);
+      background-color: color-mix(in oklab, var(--theme-warning-color) 60%, transparent);
     }
   }
 
@@ -206,14 +210,14 @@ p:not(:last-child) {
 
     &:hover {
       background-color: color-mix(
-        in srgb,
+        in oklab,
         var(--theme-danger-color) 80%,
         var(--theme-danger-contrast-color)
       );
     }
 
     &:active {
-      background-color: color-mix(in srgb, var(--theme-danger-color) 60%, transparent);
+      background-color: color-mix(in oklab, var(--theme-danger-color) 60%, transparent);
     }
   }
 
@@ -239,6 +243,70 @@ p:not(:last-child) {
     width: 32px;
     height: 32px;
     padding: 0;
+  }
+}
+
+.form-section-title {
+  font-weight: bold;
+  font-size: 13pt;
+  margin: 20px 0 10px 0;
+  color: var(--theme-contrast-color-opacity-3);
+}
+
+.form-row {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  > .input-group {
+    flex: 1;
+  }
+}
+
+.input-group {
+  label {
+    span {
+      display: block;
+      font-size: 10pt;
+      font-weight: bold;
+      color: var(--theme-contrast-color-opacity-5);
+      margin: 0 0 2px 5px;
+    }
+  }
+
+  &:has(input[type='checkbox']) {
+    label {
+      span {
+        display: inline;
+      }
+    }
+  }
+}
+
+input,
+select,
+textarea {
+  &.form-input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--theme-contrast-color-opacity-05);
+    border-radius: 10px;
+    background-color: var(--theme-contrast-color-opacity-05);
+    color: var(--theme-contrast-color);
+    outline: none;
+  }
+}
+
+input[type='checkbox'] {
+  &.form-input {
+    display: inline;
+    width: auto;
+    vertical-align: middle;
   }
 }
 </style>

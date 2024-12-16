@@ -3,49 +3,41 @@ import { nextTick, useTemplateRef, watch } from 'vue'
 
 const $content = useTemplateRef<HTMLDivElement | null>('content')
 
-const props = defineProps<{
+const show = defineModel<boolean>('show')
+
+defineProps<{
   title?: string
-  show: boolean
 }>()
 
-defineEmits<{
-  'update:show': (value: boolean) => void
-}>()
+watch(show, (value) => {
+  if (!value) return
 
-watch(
-  () => props.show,
-  (value) => {
-    if (!value) return
+  const focusableElements = [
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    'button:not([disabled])',
+    '[tabindex]'
+  ].join(', ')
 
-    const focusableElements = [
-      'input:not([disabled])',
-      'select:not([disabled])',
-      'textarea:not([disabled])',
-      'button:not([disabled])',
-      '[tabindex]'
-    ].join(', ')
+  nextTick().then(() => {
+    const firstFocusableEl = $content.value?.querySelector(focusableElements) as HTMLElement | null
 
-    nextTick().then(() => {
-      const firstFocusableEl = $content.value?.querySelector(
-        focusableElements
-      ) as HTMLElement | null
-
-      setTimeout(() => {
-        firstFocusableEl?.focus()
-      }, 100)
-    })
-  }
-)
+    setTimeout(() => {
+      firstFocusableEl?.focus()
+    }, 100)
+  })
+})
 </script>
 
 <template>
   <div v-if="show" class="dialog-modal">
-    <div class="overflow"></div>
+    <div class="overlay"></div>
     <div class="modal">
       <h1 class="title">
-        {{ title }}
+        <span>{{ title }}</span>
 
-        <button @click="$emit('update:show', false)" class="modal-close">
+        <button @click="show = false" class="modal-close">
           <v-icon name="co-x" />
         </button>
       </h1>
@@ -68,12 +60,12 @@ watch(
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 
-  > .overflow {
+  > .overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -85,20 +77,30 @@ watch(
 
   > .modal {
     position: relative;
-    z-index: 1;
-    background-color: var(--theme-color);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 80px);
     border-radius: 15px;
+    background-color: var(--theme-color);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    z-index: 1;
 
     > .title {
-      padding: 15px;
+      display: flex;
+      align-items: center;
+      padding: 12px;
       border-bottom: 1px solid var(--theme-contrast-color-opacity-05);
-      font-size: 10pt;
-      font-weight: normal;
-      color: var(--theme-contrast-color-opacity-3);
+
+      span {
+        flex: 1;
+        font-size: 11pt;
+        font-weight: normal;
+        color: var(--theme-contrast-color-opacity-5);
+      }
 
       button {
-        float: right;
+        flex: 0;
         width: 24px;
         height: 24px;
         background-color: transparent;
@@ -117,14 +119,17 @@ watch(
     }
 
     > .content {
+      flex: 1;
       padding: 20px;
       font-size: 11pt;
+      overflow: hidden auto;
     }
 
     > .controls {
       padding: 15px;
       border-top: 1px solid var(--theme-contrast-color-opacity-05);
       text-align: right;
+      background-color: var(--theme-contrast-color-opacity-05);
     }
   }
 }

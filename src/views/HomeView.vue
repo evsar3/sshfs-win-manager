@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { VueDraggableNext } from 'vue-draggable-next'
 
 import ConnectionItem from '../components/ConnectionItem.vue'
+import ConnectionOptionsEditor from '../components/ConnectionOptionsEditor.vue'
 import DialogModal from '../components/DialogModal.vue'
 import GroupItem from '../components/GroupItem.vue'
 
@@ -11,17 +12,23 @@ import { Group, useGroupStore } from '../store/groups'
 import { useMainStore } from '../store/main'
 import { useSettingsStore } from '../store/settings'
 
-const mainStore = useMainStore()
+const appReady = ref(false)
+
 const connectionStore = useConnectionStore()
 const groupStore = useGroupStore()
 const settingsStore = useSettingsStore()
+const mainStore = useMainStore()
 
 const draggingConnection = ref<Connection | null>(null)
 const dropoverGroup = ref<Group | null>(null)
 
+const isEditing = ref(false)
+
 const showGroupEditor = ref(false)
 const groupEditorData = ref<Partial<Group>>({})
-const isEditingGroup = ref(false)
+
+const showConnectionEditor = ref(false)
+const connectionEditorData = ref<Partial<Connection>>({})
 
 const showSettings = ref(false)
 
@@ -32,7 +39,7 @@ const showConnectionDeletionConfirmation = ref(false)
 const deleteConnectionId = ref('')
 
 const connections = computed<Connection[]>(() => {
-  return mainStore.getActiveGroup().connections.map((id) => connectionStore.get(id))
+  return mainStore.getActiveGroup()?.connections.map((id) => connectionStore.get(id)) ?? []
 })
 
 function connect(connection: Connection): void {
@@ -64,23 +71,43 @@ function groupDrop(event: DragEvent): void {
 function openGroupEditor(group?: Group): void {
   if (group) {
     groupEditorData.value = { ...group }
-    isEditingGroup.value = true
+    isEditing.value = true
   } else {
     groupEditorData.value = {}
-    isEditingGroup.value = false
+    isEditing.value = false
   }
 
   showGroupEditor.value = true
 }
 
+function openConnectionEditor(connection?: Connection): void {
+  if (connection) {
+    connectionEditorData.value = { ...connection }
+    isEditing.value = true
+  } else {
+    connectionEditorData.value = {
+      port: '22',
+      authMethod: 'password',
+      options: []
+    }
+    isEditing.value = false
+  }
+
+  showConnectionEditor.value = true
+}
+
 function resetGroupEditorData(): void {
   groupEditorData.value = {}
-
   showGroupEditor.value = false
 }
 
+function resetConnectionEditorData(): void {
+  connectionEditorData.value = {}
+  showConnectionEditor.value = false
+}
+
 function saveGroup(): void {
-  if (isEditingGroup.value) {
+  if (isEditing.value) {
     groupStore.update(groupEditorData.value as Group)
   } else {
     groupStore.add(groupEditorData.value as Group)
@@ -89,9 +116,44 @@ function saveGroup(): void {
   resetGroupEditorData()
 }
 
+function saveConnection(): void {
+  if (isEditing.value) {
+    connectionStore.update(connectionEditorData.value as Connection)
+  } else {
+    connectionStore.add(connectionEditorData.value as Connection)
+  }
+
+  resetConnectionEditorData()
+}
+
 function openGroupDeletionConfirmation(group: Group): void {
   deleteGroupId.value = group.id
   showGroupDeletionConfirmation.value = true
+}
+
+function browseConnectionKeyFile(): void {
+  window.electronAPI
+    .dialog({
+      properties: ['openFile']
+    })
+    .then((result) => {
+      if (result.canceled) return
+
+      connectionEditorData.value.keyFile = result.filePaths[0]
+    })
+}
+
+function browseSshfsBin(): void {
+  window.electronAPI
+    .dialog({
+      properties: ['openFile'],
+      filters: [{ name: 'Executable', extensions: ['exe'] }]
+    })
+    .then((result) => {
+      if (result.canceled) return
+
+      settingsStore.settings.sshfsBin = result.filePaths[0]
+    })
 }
 
 function deleteGroup(): void {
@@ -120,12 +182,20 @@ function cloneConnection(connection: Connection): void {
     groupStore.addConnection(mainStore.activeGroupId, conn.id)
   }
 }
+
+onMounted(() => {
+  setTimeout(() => {
+    appReady.value = true
+  }, 2000)
+})
 </script>
 
 <template>
   <nav class="handle"></nav>
 
-  <main>
+  <div v-if="!appReady" class="app-loading"></div>
+
+  <main v-else>
     <aside>
       <h1 class="title">
         Groups
@@ -167,10 +237,14 @@ function cloneConnection(connection: Connection): void {
         >
           <v-icon name="co-swap-vertical" />
         </button>
-        <button @click="showSettings = true" class="btn btn-icon">
+        <button @click="showSettings = true" class="btn btn-icon btn-space-left">
           <v-icon name="co-cog" />
         </button>
-        <button class="btn btn-icon btn-primary" :disabled="mainStore.dragMode">
+        <button
+          class="btn btn-icon btn-primary btn-space-left"
+          :disabled="mainStore.dragMode"
+          @click="openConnectionEditor()"
+        >
           <v-icon name="co-plus" />
         </button>
       </nav>
@@ -190,6 +264,7 @@ function cloneConnection(connection: Connection): void {
             :draggable="mainStore.dragMode"
             @connect="connect"
             @disconnect="disconnect"
+            @edit="openConnectionEditor"
             @delete="openConnectionDeletionConfirmation"
             @clone="cloneConnection"
           />
@@ -198,33 +273,294 @@ function cloneConnection(connection: Connection): void {
     </article>
   </main>
 
-  <DialogModal :title="(isEditingGroup ? 'Edit' : 'New') + ' Group'" v-model:show="showGroupEditor">
-    <input
-      v-model="groupEditorData.name"
-      class="input-field"
-      style="width: 300px"
-      placeholder="Group Name"
-    />
+  <DialogModal :title="(isEditing ? 'Edit' : 'New') + ' Group'" v-model:show="showGroupEditor">
+    <div class="form-row">
+      <div class="input-group">
+        <label>
+          <span>Name</span>
+          <input
+            v-model="groupEditorData.name"
+            class="form-input"
+            style="width: 300px"
+            placeholder="Group Name"
+          />
+        </label>
+      </div>
+    </div>
 
     <template #actions>
       <button class="btn" @click="resetGroupEditorData">Cancel</button>
-      <button class="btn btn-primary" @click="saveGroup">
-        {{ isEditingGroup ? 'Save' : 'Create' }}
+      <button class="btn btn-primary btn-space-left" @click="saveGroup">
+        {{ isEditing ? 'Save' : 'Create' }}
+      </button>
+    </template>
+  </DialogModal>
+
+  <DialogModal
+    :title="(isEditing ? 'Edit' : 'New') + ' Connection'"
+    v-model:show="showConnectionEditor"
+  >
+    <div class="form-row" style="width: 500px">
+      <div class="input-group">
+        <label>
+          <span>Name</span>
+          <input
+            v-model="connectionEditorData.name"
+            class="form-input"
+            placeholder="Connection Name"
+          />
+        </label>
+      </div>
+    </div>
+
+    <h2 class="form-section-title">Connection</h2>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>
+          <span>Host</span>
+          <input
+            v-model="connectionEditorData.host"
+            class="form-input"
+            placeholder="Hostname or IP"
+          />
+        </label>
+      </div>
+      <div class="input-group" style="flex: 0 0 60px">
+        <label>
+          <span>Port</span>
+          <input v-model="connectionEditorData.port" class="form-input" placeholder="Port" />
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>
+          <span>Username</span>
+          <input
+            v-model="connectionEditorData.username"
+            class="form-input"
+            placeholder="Username"
+          />
+        </label>
+      </div>
+      <div class="input-group">
+        <label>
+          <span>Auth Method</span>
+          <select v-model="connectionEditorData.authMethod" class="form-input">
+            <option value="password">Password</option>
+            <option value="key-file">Private Key (file)</option>
+            <option value="key">Private Key</option>
+            <option value="request-password">Ask for Password</option>
+            <option value="agent">Agent</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div v-if="connectionEditorData.authMethod === 'password'" class="form-row">
+      <div class="input-group">
+        <label>
+          <span>Password</span>
+          <input
+            type="password"
+            v-model="connectionEditorData.password"
+            class="form-input"
+            placeholder="Password"
+          />
+        </label>
+      </div>
+    </div>
+
+    <div v-if="connectionEditorData.authMethod === 'key-file'" class="form-row">
+      <div class="input-group">
+        <label>
+          <span>Key File</span>
+          <input
+            v-model="connectionEditorData.keyFile"
+            class="form-input"
+            placeholder="%UserProfile%\.ssh\id_rsa"
+          />
+        </label>
+      </div>
+      <div class="input-group" style="flex: 0">
+        <label>
+          <span>&nbsp;</span>
+          <button class="btn btn-icon btn-primary" @click="browseConnectionKeyFile">
+            <v-icon name="co-folder-open" />
+          </button>
+        </label>
+      </div>
+    </div>
+
+    <div v-if="connectionEditorData.authMethod === 'key'" class="form-row">
+      <div class="input-group">
+        <label>
+          <span>Private Key</span>
+          <textarea
+            v-model="connectionEditorData.key"
+            class="form-input"
+            placeholder="Paste your private key here"
+            rows="5"
+          ></textarea>
+        </label>
+      </div>
+    </div>
+
+    <div
+      v-if="
+        connectionEditorData.authMethod === 'key-file' || connectionEditorData.authMethod === 'key'
+      "
+      class="form-row"
+    >
+      <div class="input-group">
+        <label>
+          <span>Passphrase</span>
+          <input
+            type="password"
+            v-model="connectionEditorData.keyPassphrase"
+            class="form-input"
+            placeholder="Private key passphrase"
+          />
+        </label>
+      </div>
+    </div>
+
+    <h2 class="form-section-title">Remote</h2>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>
+          <span>Remote Path</span>
+          <input
+            v-model="connectionEditorData.remotePath"
+            class="form-input"
+            placeholder="/home/user"
+          />
+        </label>
+      </div>
+    </div>
+
+    <h2 class="form-section-title">Local</h2>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>
+          <input
+            type="checkbox"
+            v-model="connectionEditorData.automaticMountPoint"
+            class="form-input"
+          />
+          <span>Automatic Mount Point</span>
+        </label>
+      </div>
+    </div>
+
+    <div v-if="!connectionEditorData.automaticMountPoint" class="form-row">
+      <div class="input-group">
+        <label>
+          <span>Mount Point</span>
+          <input
+            v-model="connectionEditorData.mountPoint"
+            class="form-input"
+            placeholder="Drive letter or mount path"
+          />
+        </label>
+      </div>
+    </div>
+
+    <h2 class="form-section-title">Options</h2>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>
+          <input
+            v-model="connectionEditorData.connectOnStartup"
+            type="checkbox"
+            class="form-input"
+          />
+          <span>Connect on Startup</span>
+        </label>
+      </div>
+    </div>
+
+    <h2 class="form-section-title">Command Line Args</h2>
+
+    <div class="form-row">
+      <div class="input-group">
+        <ConnectionOptionsEditor v-model="connectionEditorData.options" />
+      </div>
+    </div>
+
+    <template #actions>
+      <button class="btn" @click="resetConnectionEditorData">Cancel</button>
+      <button class="btn btn-primary btn-space-left" @click="saveConnection">
+        {{ isEditing ? 'Save' : 'Create' }}
       </button>
     </template>
   </DialogModal>
 
   <DialogModal title="Settings" v-model:show="showSettings">
-    <p>
-      <label>
-        Theme:
-        <select v-model="settingsStore.settings.theme" class="input-field">
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-          <option value="auto">System</option>
-        </select>
-      </label>
-    </p>
+    <div class="form-row" style="width: 350px">
+      <div class="input-group">
+        <label>
+          <span>SSHFS Binary</span>
+          <input
+            v-model="settingsStore.settings.sshfsBin"
+            class="form-input"
+            placeholder="C:\Program Files\SSHFS-Win\bin\sshfs.exe"
+          />
+        </label>
+      </div>
+      <div class="input-group" style="flex: 0">
+        <label>
+          <span>&nbsp;</span>
+          <button class="btn btn-icon btn-primary" @click="browseSshfsBin">
+            <v-icon name="co-folder-open" />
+          </button>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row" style="width: 180px">
+      <div class="input-group">
+        <label>
+          <span>Process Status Check Interval</span>
+          <input
+            v-model="settingsStore.settings.processStatusCheckInterval"
+            class="form-input"
+            placeholder="Interval in seconds"
+          />
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row" style="width: 180px">
+      <div class="input-group">
+        <label>
+          <span>Theme</span>
+          <select v-model="settingsStore.settings.theme" class="form-input">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="auto">System</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>
+          <input
+            type="checkbox"
+            v-model="settingsStore.settings.startupWithOS"
+            class="form-input"
+          />
+          <span>Launch at Startup</span>
+        </label>
+      </div>
+    </div>
 
     <template #actions>
       <button @click="showSettings = false" class="btn btn-primary">Close</button>
@@ -232,25 +568,29 @@ function cloneConnection(connection: Connection): void {
   </DialogModal>
 
   <DialogModal title="Delete Group" v-model:show="showGroupDeletionConfirmation">
-    <p>Are you sure you want to delete this group?</p>
-    <p>Deleting this group won't delete connections linked to it.</p>
+    <div class="deletion-message">
+      <h3>Are you sure you want to delete this group?</h3>
+      <p>Deleting this group won't delete connections linked to it.</p>
+    </div>
 
     <template #actions>
       <button class="btn" @click="showGroupDeletionConfirmation = false">Cancel</button>
-      <button class="btn btn-danger" @click="deleteGroup">Delete</button>
+      <button class="btn btn-danger btn-space-left" @click="deleteGroup">Delete</button>
     </template>
   </DialogModal>
 
   <DialogModal title="Delete Connection" v-model:show="showConnectionDeletionConfirmation">
-    <p>Are you sure you want to delete this connection?</p>
-    <p v-if="mainStore.activeGroupId !== 'all'">
-      If you want to remove this connection from this specific group,<br />
-      you can do so by dragging it to the "All" group.
-    </p>
+    <div class="deletion-message">
+      <h3>Are you sure you want to delete this connection?</h3>
+      <p v-if="mainStore.activeGroupId !== 'all'">
+        If you want to remove this connection from this specific group,<br />
+        you can do so by dragging it to the "All" group.
+      </p>
+    </div>
 
     <template #actions>
       <button class="btn" @click="showConnectionDeletionConfirmation = false">Cancel</button>
-      <button class="btn btn-danger" @click="deleteConnection">Delete</button>
+      <button class="btn btn-danger btn-space-left" @click="deleteConnection">Delete</button>
     </template>
   </DialogModal>
 </template>
@@ -265,6 +605,31 @@ function cloneConnection(connection: Connection): void {
   left: 0;
   right: 0;
   -webkit-app-region: drag;
+}
+
+.app-loading {
+  width: 100%;
+  height: 100%;
+  background-color: var(--theme-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:before {
+    content: '';
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 5px solid var(--theme-contrast-color-opacity-3);
+    border-top-color: var(--theme-contrast-color);
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }
 
 main {
@@ -319,13 +684,10 @@ main {
   }
 }
 
-.input-field {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid var(--theme-contrast-color-opacity-1);
-  border-radius: 10px;
-  background-color: var(--theme-contrast-color-opacity-05);
-  color: var(--theme-contrast-color);
-  outline: none;
+.deletion-message {
+  p {
+    margin-top: 10px;
+    opacity: 0.7;
+  }
 }
 </style>

@@ -1,4 +1,5 @@
 import type { DefineComponent } from 'vue'
+
 import type { ElectronAPI } from './electron/preload/preload'
 
 declare module '*.vue' {
