@@ -16,11 +16,11 @@ SSHFS-Win Manager is a GUI (graphics user interface) for SSHFS on Windows (commi
 **Step 1**  
 
 Install SSHFS-Win on your Windows computer.  
-Follow they [installation instructions](https://github.com/billziss-gh/sshfs-win/blob/master/README.md) before continue.  
+Follow their [installation instructions](https://github.com/billziss-gh/sshfs-win/blob/master/README.md) before continuing.  
 
 **Step 2**  
 
-Once SSHFS-Win is installed, [**download the lastest setup**](https://github.com/evsar3/sshfs-win-manager/releases/latest) from the [releases](https://github.com/evsar3/sshfs-win-manager/releases) section and install it.  
+Once SSHFS-Win is installed, [**download the lastest sshfs-win-manager**](https://github.com/evsar3/sshfs-win-manager/releases/latest) from the [releases](https://github.com/evsar3/sshfs-win-manager/releases) section and install it.  
 
 **Step 3**  
 
