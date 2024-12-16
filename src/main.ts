@@ -1,8 +1,9 @@
-import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
-import App from './App.vue'
 import router from './router'
+import pinia from './store'
+
+import App from './App.vue'
 
 import { OhVueIcon, addIcons } from 'oh-vue-icons'
 import {
@@ -11,6 +12,7 @@ import {
   CoCheckAlt,
   CoClone,
   CoCog,
+  CoFolderOpen,
   CoPencil,
   CoPlus,
   CoSwapVertical,
@@ -30,14 +32,8 @@ addIcons(
   CoSwapVertical,
   CoApps,
   LaEqualsSolid,
-  CoCog
+  CoCog,
+  CoFolderOpen
 )
 
-const app = createApp(App)
-
-app.use(createPinia())
-app.use(router)
-
-app.component('v-icon', OhVueIcon)
-
-app.mount('#app')
+createApp(App).use(router).use(pinia).component('v-icon', OhVueIcon).mount('#app')
