@@ -1,16 +1,28 @@
 import { defineStore } from 'pinia'
-import { reactive } from 'vue'
+import { ref } from 'vue'
 
 export interface Settings {
+  sshfsBin: string
+  startupWithOS: boolean
+  processStatusCheckInterval: number
   theme: 'light' | 'dark' | 'auto'
 }
 
-export const useSettingsStore = defineStore('settings', () => {
-  const settings = reactive<Settings>({
-    theme: 'auto'
-  })
+export const useSettingsStore = defineStore(
+  'settings',
+  () => {
+    const settings = ref<Settings>({
+      sshfsBin: 'C:\\Program Files\\SSHFS-Win\\bin\\sshfs.exe',
+      startupWithOS: false,
+      processStatusCheckInterval: 5,
+      theme: 'auto'
+    })
 
-  return {
-    settings
+    return {
+      settings
+    }
+  },
+  {
+    useStorage: true
   }
-})
+)

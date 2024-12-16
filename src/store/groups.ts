@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { v4 as uuid } from 'uuid'
-import { reactive } from 'vue'
+import { ref } from 'vue'
 
 export interface Group {
   id: 'all' | (string & {})
@@ -11,92 +11,97 @@ export interface Group {
   connections: string[]
 }
 
-export const useGroupStore = defineStore('groups', () => {
-  const groups = reactive<Group[]>([
-    {
-      id: 'all',
-      name: 'All',
-      connections: [
-        '71c56ad1-19b0-4512-839b-a8827385d6d2',
-        '0427abb9-6442-4e87-8ce2-a4794532ad3c',
-        'de6fa09a-98b8-49b9-8dbc-56ddcbc7630c'
-      ]
-    }
-  ])
+export const useGroupStore = defineStore(
+  'groups',
+  () => {
+    const groups = ref<Group[]>([
+      {
+        id: 'all',
+        name: 'All',
+        connections: []
+      }
+    ])
 
-  function all(): Group[] {
-    return groups
-  }
-
-  function get(groupId: string): Group {
-    return groups.find((group) => group.id === groupId)!
-  }
-
-  function add(group: Omit<Group, 'id' | 'connections'>): Group | null {
-    if (group.name === '') return null
-    if (group.name === 'All') return null
-
-    const gro: Group = {
-      ...group,
-      id: uuid(),
-      connections: []
+    function all(): Group[] {
+      return groups.value
     }
 
-    groups.push(gro)
+    function get(groupId: string): Group {
+      return groups.value.find((group) => group.id === groupId)!
+    }
 
-    return gro
-  }
+    function add(group: Omit<Group, 'id' | 'connections'>): Group | null {
+      if (group.name === '') return null
+      if (group.name === 'All') return null
 
-  function update(group: Partial<Group>): void {
-    if (group.id === 'all') return
+      const gro: Group = {
+        ...group,
+        id: uuid(),
+        connections: []
+      }
 
-    const index = groups.findIndex((g) => g.id === group.id)
+      groups.value.push(gro)
 
-    Object.assign(groups[index], group)
-  }
+      return gro
+    }
 
-  function remove(groupId: string): void {
-    if (groupId === 'all') return
+    function update(group: Partial<Group>): void {
+      if (group.id === 'all') return
 
-    const index = groups.findIndex((group) => group.id === groupId)
+      const index = groups.value.findIndex((g) => g.id === group.id)
 
-    groups.splice(index, 1)
-  }
+      groups.value[index] = {
+        ...groups.value[index],
+        ...group
+      }
+    }
 
-  function addConnection(groupId: string, connectionId: string): void {
-    const group = groups.find((group) => group.id === groupId)!
+    function remove(groupId: string): void {
+      if (groupId === 'all') return
 
-    if (group.connections.includes(connectionId)) return
+      const index = groups.value.findIndex((group) => group.id === groupId)
 
-    group.connections.push(connectionId)
-  }
+      groups.value.splice(index, 1)
+    }
 
-  function removeConnection(groupId: string, connectionId: string): void {
-    if (groupId === 'all') return
+    function addConnection(groupId: string, connectionId: string): void {
+      const group = groups.value.find((group) => group.id === groupId)!
 
-    const group = groups.find((group) => group.id === groupId)!
-    const index = group.connections.findIndex((id) => id === connectionId)
+      if (group.connections.includes(connectionId)) return
 
-    group.connections.splice(index, 1)
-  }
+      group.connections.push(connectionId)
+    }
 
-  function removeConnectionFromAll(connectionId: string): void {
-    groups.forEach((group) => {
+    function removeConnection(groupId: string, connectionId: string): void {
+      if (groupId === 'all') return
+
+      const group = groups.value.find((group) => group.id === groupId)!
       const index = group.connections.findIndex((id) => id === connectionId)
 
       group.connections.splice(index, 1)
-    })
-  }
+    }
 
-  return {
-    groups,
-    all,
-    get,
-    add,
-    update,
-    remove,
-    addConnection,
-    removeConnection,
-    removeConnectionFromAll
+    function removeConnectionFromAll(connectionId: string): void {
+      groups.value.forEach((group) => {
+        const index = group.connections.findIndex((id) => id === connectionId)
+
+        group.connections.splice(index, 1)
+      })
+    }
+
+    return {
+      groups,
+      all,
+      get,
+      add,
+      update,
+      remove,
+      addConnection,
+      removeConnection,
+      removeConnectionFromAll
+    }
+  },
+  {
+    useStorage: true
   }
-})
+)

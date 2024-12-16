@@ -10,7 +10,9 @@ export const useMainStore = defineStore('main', () => {
   const groupStore = useGroupStore()
 
   function getActiveGroup(): Group {
-    return groupStore.groups.find((group) => group.id === activeGroupId.value)!
+    return (
+      groupStore.groups.find((group) => group.id === activeGroupId.value) ?? groupStore.groups[0]
+    )
   }
 
   return {

@@ -1,88 +1,93 @@
 import { defineStore } from 'pinia'
 import { v4 as uuid } from 'uuid'
-import { reactive } from 'vue'
+import { ref } from 'vue'
 import { useGroupStore } from './groups'
+
+export interface ConnectionOption {
+  id: string
+  key: string
+  value: string
+}
 
 export interface Connection {
   id: string
   name: string
   host: string
-  driveLetter: string
+  port: string
+  username: string
+  authMethod: 'password' | 'request-password' | 'key' | 'key-file' | 'agent'
+  password: string
+  key: string
+  keyFile: string
+  keyPassphrase: string
   remotePath: string
+  automaticMountPoint: boolean
+  mountPoint: string
+  connectOnStartup: boolean
+  options: ConnectionOption[]
   status: 'connected' | 'connecting' | 'disconnected'
 }
 
-export const useConnectionStore = defineStore('connections', () => {
-  const groupStore = useGroupStore()
+export const useConnectionStore = defineStore(
+  'connections',
+  () => {
+    const groupStore = useGroupStore()
 
-  const connections = reactive<Connection[]>([
-    {
-      id: '71c56ad1-19b0-4512-839b-a8827385d6d2',
-      name: 'Production Server',
-      driveLetter: 'X:',
-      host: 'foo.example.com',
-      remotePath: '/home/user',
-      status: 'disconnected'
-    },
-    {
-      id: '0427abb9-6442-4e87-8ce2-a4794532ad3c',
-      name: 'Development Server',
-      driveLetter: 'Y:',
-      host: 'bar.example.com',
-      remotePath: '/home/user',
-      status: 'disconnected'
-    },
-    {
-      id: 'de6fa09a-98b8-49b9-8dbc-56ddcbc7630c',
-      name: 'Testing Server',
-      driveLetter: 'Z:',
-      host: 'baz.example.com',
-      remotePath: '/home/user',
-      status: 'disconnected'
-    }
-  ])
+    const connections = ref<Connection[]>([])
 
-  function all(): Connection[] {
-    return connections
-  }
-
-  function get(connectionId: string): Connection {
-    return connections.find((connection) => connection.id === connectionId)!
-  }
-
-  function add(connection: Omit<Connection, 'id'>): Connection {
-    const conn: Connection = {
-      ...connection,
-      id: uuid()
+    function all(): Connection[] {
+      return connections.value
     }
 
-    connections.push(conn)
+    function get(connectionId: string): Connection {
+      return connections.value.find((connection) => connection.id === connectionId)!
+    }
 
-    groupStore.addConnection('all', conn.id)
+    function add(connection: Omit<Connection, 'id'>): Connection {
+      const conn: Connection = {
+        ...connection,
+        id: uuid(),
+        status: 'disconnected'
+      }
 
-    return conn
+      conn.options = conn.options.filter((i) => i.key !== '')
+
+      connections.value.push(conn)
+
+      groupStore.addConnection('all', conn.id)
+
+      return conn
+    }
+
+    function update(connection: Partial<Connection>): void {
+      const index = connections.value.findIndex((c) => c.id === connection.id)
+
+      connection.options = connection.options?.filter((i) => i.key !== '')
+
+      connections.value[index] = {
+        ...connections.value[index],
+        ...connection
+      }
+    }
+
+    function remove(connectionId: string): void {
+      const index = connections.value.findIndex((connection) => connection.id === connectionId)!
+
+      groupStore.removeConnectionFromAll(connectionId)
+
+      connections.value.splice(index, 1)
+    }
+
+    return {
+      connections,
+      all,
+      get,
+      add,
+      update,
+      remove
+    }
+  },
+  {
+    useSafeStorage: true
   }
-
-  function update(connection: Partial<Connection>): void {
-    const index = connections.findIndex((c) => c.id === connection.id)
-
-    Object.assign(connections[index], connection)
-  }
-
-  function remove(connectionId: string): void {
-    const index = connections.findIndex((connection) => connection.id === connectionId)!
-
-    groupStore.removeConnectionFromAll(connectionId)
-
-    connections.splice(index, 1)
-  }
-
-  return {
-    connections,
-    all,
-    get,
-    add,
-    update,
-    remove
-  }
-})
+)
