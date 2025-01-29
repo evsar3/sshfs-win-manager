@@ -60,7 +60,7 @@ export default [
     description: 'User/group ID mapping'
   },
   {
-    name: 'oidfile',
+    name: 'uidfile',
     type: 'string',
     description: 'File containing username:uid mappings for idmap=file'
   },
