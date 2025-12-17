@@ -37,11 +37,13 @@ if (isSecondInstance) {
       title: 'SSHFS-Win Manager',
       height: 500,
       width: 900,
+      minHeight: 400,
+      minWidth: 700,
       useContentSize: true,
       frame: false,
-      maximizable: false,
-      minimizable: false,
-      resizable: false
+      maximizable: true,
+      minimizable: true,
+      resizable: true
     }).create()
 
     if (!process.argv.includes('--systray')) {

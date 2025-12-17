@@ -2,14 +2,32 @@
   <Window title="SSHFS-Win Manager" closeAction="hide" @close="showRunningInBackgroundNotification">
     <div class="wrap">
       <div class="left">
+        <div class="search-box">
+          <Icon icon="search"/>
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            placeholder="Search connections..."
+            @input="searchQuery = $event.target.value"
+          />
+          <button v-show="searchQuery" class="clear-search" @click="searchQuery = ''" v-tooltip="'Clear search'">
+            <Icon icon="close"/>
+          </button>
+        </div>
+
         <div class="connection-list" :class="{'has-debug-panel': appSettings.showDebugPanel}">
           <div v-if="!hasConnections" class="no-data">
             <h1>No servers added yet</h1>
             <p>Try clicking at 'Add Server' in the panel aside</p>
           </div>
 
-          <draggable :list="connections" @end="updateConnectionList" chosenClass="highlight-item" dragClass="hide-dragging-item" handle=".grip" animation="200">
-            <ConnectionItem v-for="conn in connections" :key="conn.uuid" :conn="conn" :mode="listMode" @connect="connect" @disconnect="disconnect" @open="openLocal" @edit="editConnection" @delete="deleteConnection" @clone="cloneConnection"/>
+          <div v-else-if="hasConnections && filteredConnections.length === 0" class="no-data">
+            <h1>No results were found</h1>
+            <p>Please try again with some different keywords</p>
+          </div>
+
+          <draggable :list="filteredConnections" @end="updateConnectionList" :disabled="hasActiveSearch" chosenClass="highlight-item" dragClass="hide-dragging-item" handle=".grip" animation="200">
+            <ConnectionItem v-for="conn in filteredConnections" :key="conn.uuid" :conn="conn" :mode="listMode" @connect="connect" @disconnect="disconnect" @open="openLocal" @edit="editConnection" @delete="deleteConnection" @clone="cloneConnection"/>
           </draggable>
         </div>
 
@@ -323,6 +341,30 @@ export default {
 
     appSettings () {
       return this.$store.state.Settings.settings
+    },
+
+    filteredConnections () {
+      if (!this.searchQuery.trim()) {
+        return this.connections
+      }
+
+      const query = this.searchQuery.toLowerCase().trim()
+
+      return this.connections.filter(conn => {
+        const name = (conn.name || '').toLowerCase()
+        const host = (conn.host || '').toLowerCase()
+        const folder = (conn.folder || '').toLowerCase()
+        const mountPoint = (conn.mountPoint || '').toLowerCase()
+
+        return name.includes(query) ||
+               host.includes(query) ||
+               folder.includes(query) ||
+               mountPoint.includes(query)
+      })
+    },
+
+    hasActiveSearch () {
+      return this.searchQuery.trim().length > 0
     }
   },
 
@@ -330,7 +372,8 @@ export default {
     return {
       listMode: 'none',
       runningInBackgroundNotificationShowed: false,
-      debugOutput: ''
+      debugOutput: '',
+      searchQuery: ''
     }
   },
 
@@ -414,17 +457,86 @@ export default {
 
   .left {
     @debug-panel-height: 200px;
+    @search-box-height: 50px;
 
     flex: 1;
     height: calc(100vh - 32px);
     position: relative;
 
+    .search-box {
+      position: relative;
+      height: @search-box-height;
+      padding: 10px 15px;
+      background: lighten(@main-color, 2%);
+      border-bottom: 1px solid lighten(@main-color, 1%);
+      display: flex;
+      align-items: center;
+
+      svg {
+        fill: fade(contrast(@main-color), 30%);
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        margin-right: 10px;
+      }
+
+      input {
+        flex: 1;
+        background: lighten(@main-color, 5%);
+        border: 1px solid fade(contrast(@main-color), 5%);
+        outline: none;
+        padding: 8px 12px;
+        color: contrast(@main-color);
+        font-size: 11pt;
+        margin-right: 10px;
+
+        &::placeholder {
+          color: fade(contrast(@main-color), 30%);
+        }
+
+        &:focus {
+          border-color: @primary-color;
+          background-color: fade(@primary-color, 10%);
+        }
+      }
+
+      .clear-search {
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 100%;
+        padding: 5px;
+        background: fade(contrast(@main-color), 5%);
+        cursor: pointer;
+        outline: none;
+        flex-shrink: 0;
+
+        &:hover {
+          background: @primary-color;
+
+          svg {
+            fill: contrast(@primary-color);
+          }
+        }
+
+        &:active {
+          background: darken(@primary-color, 5%);
+        }
+
+        svg {
+          fill: contrast(@main-color);
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+
     .connection-list {
-      height: 100%;
+      height: calc(100% - @search-box-height);
       overflow: auto;
 
       &.has-debug-panel {
-        height: calc(100% - @debug-panel-height);
+        height: calc(100% - @search-box-height - @debug-panel-height);
       }
 
       .no-data {
