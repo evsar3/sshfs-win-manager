@@ -3,6 +3,16 @@ import { exec, spawn } from 'child_process'
 import { dirname } from 'path'
 import { existsSync as fileExistsSync } from 'fs'
 
+function buildSpawnEnv (sshfsBinary) {
+  const env = Object.assign({}, process.env)
+  const pathKey = Object.keys(env).find(key => key.toUpperCase() === 'PATH') || 'Path'
+  const sshfsDir = dirname(sshfsBinary)
+
+  env[pathKey] = env[pathKey] ? `${sshfsDir};${env[pathKey]}` : sshfsDir
+
+  return env
+}
+
 class ProcessHandlerWin {
   constructor (settings) {
     this.settings = settings
@@ -93,9 +103,7 @@ class ProcessHandlerWin {
       console.log('cmd:', `"${this.settings.sshfsBinary}" ${cmdArgs.join(' ')}`)
 
       const process = spawn(this.settings.sshfsBinary, cmdArgs, {
-        env: {
-          PATH: dirname(this.settings.sshfsBinary)
-        }
+        env: buildSpawnEnv(this.settings.sshfsBinary)
       })
 
       if (conn.authType === 'password' || conn.authType === 'password-ask') {
