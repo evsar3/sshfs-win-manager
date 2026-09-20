@@ -1,4 +1,4 @@
-import { exec, spawn } from 'child_process'
+import { exec, execFile, spawn } from 'child_process'
 
 import { dirname } from 'path'
 import { existsSync as fileExistsSync } from 'fs'
@@ -9,17 +9,21 @@ class ProcessHandlerWin {
   }
 
   create (conn) {
-    return new Promise(async (resolve, reject) => {
+    if (conn.mountPoint === 'auto') {
+      return this.getFirstAvailableDriveLetter(conn.preferredMountPoint).then(mountPoint => {
+        conn.preferredMountPoint = mountPoint
+
+        return this.createProcess(conn, mountPoint)
+      })
+    }
+
+    return this.createProcess(conn, conn.mountPoint)
+  }
+
+  createProcess (conn, mountPoint) {
+    return new Promise((resolve, reject) => {
       if (this.settings.sshfsBinary.endsWith('sshfs-win.exe')) {
         this.settings.sshfsBinary = this.settings.sshfsBinary.replace(/sshfs-win\.exe$/, 'sshfs.exe')
-      }
-
-      let mountPoint = conn.mountPoint
-
-      if (mountPoint === 'auto') {
-        mountPoint = await this.getFirstAvailableDriveLetter(conn.preferredMountPoint)
-
-        conn.preferredMountPoint = mountPoint
       }
 
       let cmdArgs = [
@@ -177,11 +181,15 @@ class ProcessHandlerWin {
 
   getChildProcessPid (parentPid) {
     return new Promise((resolve, reject) => {
-      exec(`wmic process where '(name="sshfs.exe" and parentprocessid=${parentPid})' get processid /value`, (err, stdout) => {
-        if (!err) {
-          resolve(parseInt(stdout.toString().trim().split('=')[1]))
-        } else {
+      const command = `$ErrorActionPreference = 'Stop'; Get-CimInstance Win32_Process -Filter "Name = 'sshfs.exe' AND ParentProcessId = ${parentPid}" | Select-Object -First 1 -ExpandProperty ProcessId`
+
+      execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', command], (err, stdout) => {
+        const pid = parseInt(stdout.toString().trim())
+
+        if (err || Number.isNaN(pid)) {
           reject(new Error('Process not found'))
+        } else {
+          resolve(pid)
         }
       })
     })
@@ -189,8 +197,10 @@ class ProcessHandlerWin {
 
   getLastSpawnedProcess () {
     return new Promise((resolve, reject) => {
-      exec(`wmic process where '(name="sshfs.exe")' get processid, creationdate /value`, (err, stdout) => {
-        if (!err) {
+      const command = `$ErrorActionPreference = 'Stop'; Get-CimInstance Win32_Process -Filter "Name = 'sshfs.exe'" | Sort-Object CreationDate -Descending | Select-Object -First 1 | ForEach-Object { 'CreationDate=' + [System.Management.ManagementDateTimeConverter]::ToDmtfDateTime($_.CreationDate); 'ProcessId=' + $_.ProcessId }`
+
+      execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', command], (err, stdout) => {
+        if (!err && stdout.toString().trim()) {
           let data = stdout.toString().trim().split('\n')
           let pid = null
           let creationDate = null
@@ -211,7 +221,7 @@ class ProcessHandlerWin {
               let day = parseInt(value.substr(6, 2))
               let hours = parseInt(value.substr(8, 2))
               let minutes = parseInt(value.substr(10, 2))
-              let seconds = parseInt(value.substr(13, 2))
+              let seconds = parseInt(value.substr(12, 2))
 
               creationDate = new Date(year, month, day, hours, minutes, seconds)
             }
@@ -227,21 +237,25 @@ class ProcessHandlerWin {
 
   getFirstAvailableDriveLetter (preferredMountPoint = null) {
     return new Promise((resolve, reject) => {
-      exec(`wmic logicaldisk get name`, (err, stdout) => {
+      const command = `$ErrorActionPreference = 'Stop'; Get-CimInstance Win32_LogicalDisk | Select-Object -ExpandProperty DeviceID`
+
+      execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', command], (err, stdout) => {
         const driveLetters = 'DEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
         if (!err) {
-          const drivers = stdout.toString().trim().split('\n').slice(1)
-            .map(i => i.substr(0, 1).toUpperCase())
-          const availableDriveLetters = driveLetters.filter(i => !drivers.includes(i))
+          const drivers = stdout.toString().trim().split(/\r?\n/)
+            .map(item => item.substr(0, 1).toUpperCase())
+          const availableDriveLetters = driveLetters.filter(letter => !drivers.includes(letter))
 
           if (preferredMountPoint && availableDriveLetters.includes(preferredMountPoint.substr(0, 1))) {
             resolve(preferredMountPoint)
-          } else {
+          } else if (availableDriveLetters.length > 0) {
             resolve(availableDriveLetters[0] + ':')
+          } else {
+            reject(new Error('No available drive letters'))
           }
         } else {
-          reject(new Error('Process not found'))
+          reject(new Error('Could not get available drive letters'))
         }
       })
     })
