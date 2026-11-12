@@ -101,18 +101,13 @@ export default {
     },
 
     connect (conn) {
-      conn.status = 'connecting'
+      this.setConnectionStatus(conn, { status: 'connecting' })
 
       const connect = c => {
         ProcessManager.create(c).then(pid => {
-          conn.pid = pid
-          conn.status = 'connected'
-
-          this.updateConnectionList()
+          this.setConnectionStatus(conn, { pid, status: 'connected' })
         }).catch(error => {
-          conn.status = 'disconnected'
-
-          this.updateConnectionList()
+          this.setConnectionStatus(conn, { status: 'disconnected' })
 
           this.notify(`Can't connect to '${conn.name}': ${error}`, 'error-icon')
         })
@@ -142,7 +137,7 @@ export default {
               break
 
             case 'connection-password-cancel':
-              conn.status = 'disconnected'
+              this.setConnectionStatus(conn, { status: 'disconnected' })
               break
           }
         })
@@ -152,12 +147,10 @@ export default {
     },
 
     disconnect (conn) {
-      conn.status = 'disconnecting'
+      this.setConnectionStatus(conn, { status: 'disconnecting' })
 
       ProcessManager.terminate(conn.pid).then(() => {
-        conn.status = 'disconnected'
-
-        this.updateConnectionList()
+        this.setConnectionStatus(conn, { status: 'disconnected' })
       })
     },
 
@@ -297,6 +290,10 @@ export default {
 
     updateConnectionList () {
       this.$store.dispatch('REFRESH_CONNECTIONS', this.connections)
+    },
+
+    setConnectionStatus (conn, changes) {
+      this.$store.dispatch('UPDATE_CONNECTION_STATUS', { uuid: conn.uuid, ...changes })
     }
   },
 
@@ -354,8 +351,7 @@ export default {
     }
 
     this.connections.forEach(conn => {
-      conn.status = 'disconnected'
-      conn.pid = null
+      this.setConnectionStatus(conn, { pid: null, status: 'disconnected' })
 
       if (conn.advanced.connectOnStartup) {
         this.connect(conn)
@@ -366,8 +362,7 @@ export default {
       let conn = this.getConnectionByPid(pid)
 
       if (conn) {
-        conn.pid = null
-        conn.status = 'disconnected'
+        this.setConnectionStatus(conn, { pid: null, status: 'disconnected' })
       }
     })
 
@@ -375,8 +370,7 @@ export default {
       let conn = this.getConnectionByPid(pid)
 
       if (conn) {
-        conn.pid = null
-        conn.status = 'disconnected'
+        this.setConnectionStatus(conn, { pid: null, status: 'disconnected' })
 
         this.notify(`'${conn.name}' was disconnected due to a connection error.\nCheck your internet connection`, 'error-icon')
       }
@@ -388,8 +382,7 @@ export default {
           let foundConnection = this.connections.find(i => i.pid === process.pid)
 
           if (!foundConnection) {
-            conn.pid = process.pid
-            conn.status = 'connected'
+            this.setConnectionStatus(conn, { pid: process.pid, status: 'connected' })
 
             ProcessManager.watch(process.pid)
 
@@ -397,8 +390,7 @@ export default {
           }
         })
       } else {
-        conn.pid = null
-        conn.status = 'disconnected'
+        this.setConnectionStatus(conn, { pid: null, status: 'disconnected' })
 
         this.notify(`Process Timeout: Couldn't connect to '${conn.name}'`, 'error-icon')
       }
